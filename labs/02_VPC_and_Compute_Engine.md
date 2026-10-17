@@ -11,27 +11,22 @@
 
 ```bash
 #!/usr/bin/env bash
-# Lab 2: Get Started with Virtual Private Cloud Networking and Compute Engine - Quick Execution Script
-set -euo pipefail
+# Lab 2: Get Started with VPC Networking and Compute Engine - Quick Execution Script
+# Run inside the mynet-us-vm SSH window (Task 3). Firewall rules are deleted in the Console between steps.
 
-# Step Command block 1
-ping -c 3 <Enter mynet-r2-vm's internal IP here>
+# 1. All four rules present: both pings work
+ping -c 3 <mynet-r2-vm's internal IP>
+ping -c 3 <mynet-r2-vm's external IP>
 
-# Step Command block 2
-ping -c 3 <Enter mynet-r2-vm's external IP here>
+# 2. After deleting mynetwork-allow-icmp: internal still works (allow-custom), external fails (100% loss)
+ping -c 3 <mynet-r2-vm's internal IP>
+ping -c 3 <mynet-r2-vm's external IP>
 
-# Step Command block 3
-ping -c 3 <Enter mynet-r2-vm's internal IP here>
+# 3. After also deleting mynetwork-allow-custom: internal fails (100% loss)
+ping -c 3 <mynet-r2-vm's internal IP>
 
-# Step Command block 4
-ping -c 3 <Enter mynet-r2-vm's external IP here>
-
-# Step Command block 5
-ping -c 3 <Enter mynet-r2-vm's internal IP here>
-
-# Step Command block 6
+# 4. Close the SSH window, then delete mynetwork-allow-ssh in the Console and click SSH on mynet-us-vm: "Connection failed"
 exit
-
 ```
 
 ---
@@ -285,6 +280,23 @@ Remove theallow-sshfirewall rule and try to SSH tomynet-us-vm.
 > ⚠️ **Warning:**
 > Note:TheConnection failedmessage indicates that you cannot SSH tomynet-us-vmbecause you deleted theallow-sshfirewall rule!
 
+---
+
+## 📝 Lab Run Notes: what removing each firewall rule showed
+
+Task 3 deletes the rules one at a time. Each deletion removes one "allow", and the implied **deny-all-ingress** (priority 65535) takes over for whatever that rule used to cover. Rules were run in this order, and the results matched the lab text.
+
+| # | Delete (VPC network > Firewall) | Test from `mynet-us-vm` | Result | Why |
+| :--- | :--- | :--- | :--- | :--- |
+| 1 | `mynetwork-allow-icmp` (ICMP from `0.0.0.0/0`) | `ping -c 3` internal IP of `mynet-r2-vm` | ✅ Works | `allow-custom` (all protocols from `10.128.0.0/9`) still matches the internal source |
+| 1 | same | `ping -c 3` external IP of `mynet-r2-vm` | ❌ 100% packet loss | Source is outside `10.128.0.0/9`; only `allow-icmp` allowed it |
+| 2 | `mynetwork-allow-custom` | `ping -c 3` internal IP | ❌ 100% packet loss | No rule left that allows ICMP from `10.x`; then `exit` |
+| 3 | `mynetwork-allow-ssh` (`tcp:22` from `0.0.0.0/0`) | Click **SSH** on `mynet-us-vm` (Compute Engine > VM instances) | ❌ Connection failed | Ingress on port 22 now falls to deny-all-ingress |
+
+Steps for each: Navigation menu > VPC network > Firewall, select the rule, **Delete**, confirm, and wait until it disappears before testing. Rules 1 and 2 need the `mynet-us-vm` SSH window open, so delete `allow-ssh` last.
+
+> 💡 **Exam takeaway:** the same ping succeeded or failed depending only on its *source address* and which allow rule covered it. Rules match on direction, source range, protocol and port; the VPC, subnet and VMs never changed.
+
 ## Task 4. Review
 
 In this lab, you explored the default network along with its subnets, routes, and firewall rules. You deleted the default network and determined that you cannot create any VM instances without a VPC network.
@@ -329,4 +341,4 @@ Copyright 2026 Google LLC All rights reserved. Google and the Google logo are tr
 - [ ] Task 3 completed and verified.
 - [ ] Task 4 completed and verified.
 - [ ] All Qwiklabs progress checkmarks scored 100%.
-- [ ] Lab ended cleanly to avoid quota leakage.
+- [ ] Lab ended cleanly to avoid quota leakage.

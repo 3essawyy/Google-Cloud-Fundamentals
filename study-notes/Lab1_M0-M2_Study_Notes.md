@@ -122,6 +122,41 @@ flowchart TD
 | **Internet communication** | Google Front End (GFE) terminates TLS with proper certificates and perfect forward secrecy; multi-layer DoS protection |
 | **Operational security** | Intrusion detection and Red Team exercises; limited and monitored admin access; U2F keys for all employees; central source control with two-party code review; bug bounty |
 
+**Analogy:** a bank doesn't rely on one wall. It has guards at the door, ID checks, a vault and cameras, so getting past one layer still leaves the others.
+
+**Worked example:** you open your Lab 3 blog, which shows an image stored in Cloud Storage. The request meets every layer:
+
+```mermaid
+%%{init: {'theme':'base'}}%%
+flowchart LR
+    U["You<br/>browser"] --> G["1. Internet communication<br/>GFE: TLS + DoS absorbed"]
+    G --> I["2. User identity<br/>risk checks, security key"]
+    I --> S["3. Service deployment<br/>encrypted RPC between services"]
+    S --> D["4. Storage services<br/>image encrypted at rest"]
+    D --> H["5. Hardware<br/>secure boot, guarded building"]
+    H -.-> O["6. Operational security<br/>monitored staff, two-person code review"]
+    style U fill:#1a1a2e,stroke:#e94560,color:#ffffff
+    style G fill:#16213e,stroke:#0f3460,color:#ffffff
+    style I fill:#16213e,stroke:#0f3460,color:#ffffff
+    style S fill:#16213e,stroke:#0f3460,color:#ffffff
+    style D fill:#0f3460,stroke:#533483,color:#ffffff
+    style H fill:#2d3436,stroke:#6c5ce7,color:#ffffff
+    style O fill:#2d3436,stroke:#6c5ce7,color:#ffffff
+```
+
+1. **Internet communication:** your browser reaches the Google Front End first; it handles HTTPS and soaks up DoS floods before anything reaches the app.
+2. **User identity:** signing in to the console, Google checks risk signals (new device or country) and can ask for a second factor such as a security key.
+3. **Service deployment:** as Google's services pass your request between data centers, that internal RPC traffic is encrypted.
+4. **Storage services:** the image sits on disk encrypted at rest by default, with nothing for you to turn on.
+5. **Hardware:** the server runs Google-designed chips and a secure boot stack, so tampered software won't boot; the building has layered physical security.
+6. **Operational security:** staff who could touch that server have limited, monitored access and use security keys; changes to its code need two-person review.
+
+> [!IMPORTANT]
+> **What the ACE exam tests here:**
+> - Encryption at rest and in transit is **on by default**. An answer like "enable encryption on the bucket" as an extra step is usually a trap.
+> - **Shared responsibility:** Google secures these six layers; you secure yours: IAM roles, firewall rules, patching your VM's OS, and keys if you choose to manage them.
+> - You won't be asked to recite the six layers in order; know that each exists.
+
 <a id="part-1-5"></a>
 ### 1.5 Open APIs and open source
 
@@ -159,28 +194,66 @@ Some quotas can be raised by requesting an increase from Google Cloud.
 <a id="part-1-7"></a>
 ### 1.7 M1 self-check quiz
 
-1. Why use resources in several zones within one region?
-2. Which service model binds your code to libraries that give access to the infrastructure it needs?
-3. Why use resources in several regions?
-4. Name the 5 traits of cloud computing.
-5. In IaaS do you pay for resources allocated or resources used? And in PaaS?
-6. A VM runs all month. What discount do you get without doing anything?
-7. What is the difference between a rate quota and an allocation quota? At what level do both apply?
-8. Your budget is \$1,000 with an alert at 90%. What happens when spend reaches \$900, and what happens at \$1,100?
-9. Which layer of Google's security model covers encryption at rest?
+<details>
+<summary><strong>Q1.</strong> Why use resources in several zones within one region?</summary>
+
+Fault tolerance.
+
+</details>
 
 <details>
-<summary><strong>Click to expand: M1 answers</strong></summary>
+<summary><strong>Q2.</strong> Which service model binds your code to libraries that give access to the infrastructure it needs?</summary>
 
-1. Fault tolerance.
-2. PaaS.
-3. Closer to users around the world, and protection against a whole-region failure.
-4. On-demand self-service, broad network access, resource pooling, rapid elasticity, measured service.
-5. IaaS: allocated. PaaS: used.
-6. A sustained use discount (it applies past 25% of the month).
-7. A rate quota resets after a time window; an allocation quota caps a count of resources. Both are per project.
-8. At \$900 you get an alert. At \$1,100 you get another alert if one is set at 100%, but nothing stops: budgets don't cap spend.
-9. Storage services.
+PaaS.
+
+</details>
+
+<details>
+<summary><strong>Q3.</strong> Why use resources in several regions?</summary>
+
+Closer to users around the world, and protection against a whole-region failure.
+
+</details>
+
+<details>
+<summary><strong>Q4.</strong> Name the 5 traits of cloud computing.</summary>
+
+On-demand self-service, broad network access, resource pooling, rapid elasticity, measured service.
+
+</details>
+
+<details>
+<summary><strong>Q5.</strong> In IaaS do you pay for resources allocated or resources used? And in PaaS?</summary>
+
+IaaS: allocated. PaaS: used.
+
+</details>
+
+<details>
+<summary><strong>Q6.</strong> A VM runs all month. What discount do you get without doing anything?</summary>
+
+A sustained use discount (it applies past 25% of the month).
+
+</details>
+
+<details>
+<summary><strong>Q7.</strong> What is the difference between a rate quota and an allocation quota? At what level do both apply?</summary>
+
+A rate quota resets after a time window; an allocation quota caps a count of resources. Both are per project.
+
+</details>
+
+<details>
+<summary><strong>Q8.</strong> Your budget is &#36;1,000 with an alert at 90%. What happens when spend reaches &#36;900, and what happens at &#36;1,100?</summary>
+
+At \$900 you get an alert. At \$1,100 you get another alert if one is set at 100%, but nothing stops: budgets don't cap spend.
+
+</details>
+
+<details>
+<summary><strong>Q9.</strong> Which layer of Google's security model covers encryption at rest?</summary>
+
+Storage services.
 
 </details>
 
@@ -307,30 +380,73 @@ A project-level custom role can't include org- or folder-only permissions such a
 <a id="part-2-8"></a>
 ### 2.8 M2 self-check quiz
 
-1. Services and APIs are enabled on a per-what basis?
-2. Order the IAM role types from broadest to finest-grained.
-3. Which value is globally unique and unchangeable after creation, but chosen by you during creation?
-4. Name the four levels of the resource hierarchy from the top.
-5. Bob has Viewer on the organization and Editor on a folder. What can he do on a project inside that folder?
-6. Bob has an allow policy granting Editor, and a deny policy denying `compute.instances.delete`. Can he delete a VM?
-7. At which levels can you create a custom role, and where can't you?
-8. How does a service account authenticate, and why can it also have IAM policies attached to it?
-9. An employee leaves. Which tool lets an admin remove their access in one place?
-10. Name Cloud Shell's two key properties for running lab commands.
+<details>
+<summary><strong>Q1.</strong> Services and APIs are enabled on a per-what basis?</summary>
+
+Per project.
+
+</details>
 
 <details>
-<summary><strong>Click to expand: M2 answers</strong></summary>
+<summary><strong>Q2.</strong> Order the IAM role types from broadest to finest-grained.</summary>
 
-1. Per project.
-2. Basic, predefined, custom.
-3. The project ID.
-4. Organization node, folders, projects, resources.
-5. Edit: he gets the union of Viewer and Editor, inherited down to the project.
-6. No. Deny policies are checked first and win.
-7. Project or organization level. Never at folder level.
-8. With cryptographic keys, not a password. It is also a resource, so people can be granted roles to use or manage it.
-9. Cloud Identity, through the Google Admin console.
-10. Pre-authenticated with the SDK preinstalled, and a persistent 5 GB home directory.
+Basic, predefined, custom.
+
+</details>
+
+<details>
+<summary><strong>Q3.</strong> Which value is globally unique and unchangeable after creation, but chosen by you during creation?</summary>
+
+The project ID.
+
+</details>
+
+<details>
+<summary><strong>Q4.</strong> Name the four levels of the resource hierarchy from the top.</summary>
+
+Organization node, folders, projects, resources.
+
+</details>
+
+<details>
+<summary><strong>Q5.</strong> Bob has Viewer on the organization and Editor on a folder. What can he do on a project inside that folder?</summary>
+
+Edit: he gets the union of Viewer and Editor, inherited down to the project.
+
+</details>
+
+<details>
+<summary><strong>Q6.</strong> Bob has an allow policy granting Editor, and a deny policy denying <code>compute.instances.delete</code>. Can he delete a VM?</summary>
+
+No. Deny policies are checked first and win.
+
+</details>
+
+<details>
+<summary><strong>Q7.</strong> At which levels can you create a custom role, and where can't you?</summary>
+
+Project or organization level. Never at folder level.
+
+</details>
+
+<details>
+<summary><strong>Q8.</strong> How does a service account authenticate, and why can it also have IAM policies attached to it?</summary>
+
+With cryptographic keys, not a password. It is also a resource, so people can be granted roles to use or manage it.
+
+</details>
+
+<details>
+<summary><strong>Q9.</strong> An employee leaves. Which tool lets an admin remove their access in one place?</summary>
+
+Cloud Identity, through the Google Admin console.
+
+</details>
+
+<details>
+<summary><strong>Q10.</strong> Name Cloud Shell's two key properties for running lab commands.</summary>
+
+Pre-authenticated with the SDK preinstalled, and a persistent 5 GB home directory.
 
 </details>
 

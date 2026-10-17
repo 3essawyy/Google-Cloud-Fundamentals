@@ -32,6 +32,7 @@
   - [7.2 Checklist](#part-7-2)
   - [7.3 Expected results](#part-7-3)
   - [7.4 Commands for the Gemini CLI agent](#part-7-4)
+  - [7.5 What you saw in the lab: removing the rules](#part-7-5)
 - [PART 8 — Grill log: questions, slips and the reasoning behind them](#part-8)
   - [8.1 Deep dives on the slips](#part-8-1)
   - [8.2 Questions you asked](#part-8-2)
@@ -578,6 +579,17 @@ Do not run anything yourself.
 
 <PASTE COMMANDS>
 ```
+
+<a id="part-7-5"></a>
+### 7.5 What you saw in the lab: removing the rules
+
+You ran Task 3 on 2026-10-17 and it went smoothly. In order, from the `mynet-us-vm` SSH window (Navigation menu > VPC network > Firewall > select rule > Delete > confirm > wait until gone):
+
+1. **Delete `mynetwork-allow-icmp`.** Ping `mynet-r2-vm`'s **internal** IP: ✅ works, because `allow-custom` (all protocols from `10.128.0.0/9`) still matches. Ping its **external** IP: ❌ 100% packet loss, because that source is outside `10.128.0.0/9` and only `allow-icmp` (from `0.0.0.0/0`) allowed it.
+2. **Delete `mynetwork-allow-custom`.** Ping the internal IP again: ❌ 100% packet loss, since nothing allows ICMP from `10.x` any more. Then `exit` the SSH window.
+3. **Delete `mynetwork-allow-ssh`.** In Compute Engine > VM instances click **SSH** on `mynet-us-vm`: ❌ "Connection failed", because `tcp:22` ingress now falls to the implied deny-all-ingress.
+
+Why: each deletion removes one allow, and the implied deny-all-ingress (priority 65535) takes over for what it covered. The VPC, subnets and VMs never changed; only the rules did. Delete `allow-ssh` last, since steps 1 and 2 need the SSH window.
 
 ---
 

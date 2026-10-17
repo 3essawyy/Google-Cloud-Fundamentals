@@ -9,7 +9,7 @@
 ## Table of Contents
 
 - [PART 0 — What Lab 2 covers](#part-0)
-- [Google Cloud ↔ AWS mapping (M3)](#part-aws)
+- [What each service does (M3)](#part-aws)
 - [PART 1 — VPC networking](#part-1)
   - [1.1 Global network, regional subnets](#part-1-1)
   - [1.2 Auto mode vs custom mode](#part-1-2)
@@ -48,42 +48,31 @@ Everything below keeps what Lab 2 or the Associate Cloud Engineer (ACE) exam nee
 ---
 
 <a id="part-aws"></a>
-## Google Cloud ↔ AWS mapping (M3)
+## What each service does (M3)
 
-| Google Cloud | AWS equivalent | Note |
+Each row says what the service is for and the role it plays. **≈ AWS** appears only where it matches one of the services you already know: EC2, S3, Lambda, a CDN, Postgres or a NoSQL database. Everything else is described on its own terms.
+
+| Service | Role it plays | Familiar? |
 | :--- | :--- | :--- |
-| **VPC network** | VPC | GCP: global, one VPC spans every region. AWS: one region |
-| **Subnet** | Subnet | GCP: regional, spans all zones of a region. AWS: one Availability Zone |
-| **Auto mode VPC / default network** | Default VPC | Auto mode makes one subnet per region for you |
-| **Firewall rules** | Security groups + network ACLs | One rule set per VPC; allow or deny; stateful; picks VMs by network tag or service account |
-| **Network tag** | Security group membership | How a firewall rule targets a group of VMs |
-| **Routes (built in)** | Route tables | No router to provision; subnet routes are created for you |
-| **Default internet gateway route** | Internet Gateway + 0.0.0.0/0 route | Created with the VPC |
-| **Compute Engine VM** | EC2 instance | |
-| **Machine type** (`e2-micro`, `e2-medium`) | Instance type (`t3.micro`) | E2 is the cost-optimised family, close to T3 |
-| **Custom machine type** | (none) | Pick exact vCPU and memory; AWS has fixed sizes |
-| **Sustained use discount** | (none) | Automatic, no commitment |
-| **Committed use discount** | Savings Plans / Reserved Instances | 1 or 3 years |
-| **Spot VM** | Spot Instance | Up to about 90% off, can be stopped any time |
-| **Zonal / regional persistent disk** | EBS volume | Regional PD replicates across 2 zones; EBS has no direct equivalent |
-| **Local SSD** | Instance store | Fast, data lost when the VM stops |
-| **Filestore** | EFS | Managed file shares (NFS) |
-| **Ephemeral external IP** | Auto-assigned public IP | Released when the VM stops |
-| **Static external IP** | Elastic IP | Kept until you release it |
-| **Managed instance group + instance template** | Auto Scaling group + launch template | Autoscaling |
-| **VPC Network Peering** | VPC peering | Non-transitive in both |
-| **Shared VPC** | Shared subnets via AWS RAM | One host project shares its VPC with service projects |
-| **Application Load Balancer** | ALB | Layer 7, HTTP and HTTPS |
-| **Network Load Balancer** | NLB | Layer 4, TCP, UDP and more |
-| **Cloud DNS** | Route 53 | Managed DNS |
-| **Cloud CDN** | CloudFront | |
-| **Cloud VPN + Cloud Router** | Site-to-Site VPN + BGP | Cloud Router exchanges routes over BGP |
-| **Dedicated Interconnect** | Direct Connect (dedicated) | Your own physical link |
-| **Partner Interconnect** | Direct Connect (hosted, via partner) | Through a service provider |
-| **Cross-Cloud Interconnect** | (no direct equivalent) | Google-built link to another cloud |
-| **SSH button in the console** | EC2 Instance Connect | Key generated for you |
+| **VPC network** | Your private network inside Google Cloud. One VPC is **global** and spans every region; you don't set up one per region | |
+| **Subnet** | A slice of the VPC's IP space, tied to **one region** and shared by all its zones. A VM gets its internal IP from it | |
+| **Firewall rules** | Allow or deny traffic to and from VMs. Defined once per VPC and enforced at each VM; VMs are picked by network tag | |
+| **Routes** | Tell traffic where to go. Built in, nothing to provision | |
+| **Compute Engine** | Virtual machines you configure and patch yourself. The service Lab 2 uses | ≈ **EC2** |
+| **Persistent disk, Local SSD** | Block storage for a VM. Persistent disks outlive the VM; Local SSD is fast but lost when the VM stops | |
+| **Cloud Storage** | Object storage for files of any size, used from VMs and apps (Lab 3) | ≈ **S3** |
+| **Cloud SQL** | Managed relational database (MySQL, PostgreSQL, SQL Server), so you don't run the database server (Lab 3) | ≈ **Postgres** |
+| **Firestore, Bigtable** | Managed NoSQL databases for documents and wide-column data (ACE material, later) | ≈ **NoSQL** |
+| **Cloud Run functions** | Run a single function when an event or request arrives, with no server to manage | ≈ **Lambda** |
+| **Cloud CDN** | Caches content at Google's edge so users get it from a nearby location. One checkbox on an Application Load Balancer | ≈ **CDN** |
+| **Managed instance group** | A group of identical VMs built from one template that **autoscales** with load | |
+| **Cloud Load Balancing** | One managed front door that spreads traffic across VMs, even across regions. Nothing to run or pre-warm | |
+| **Cloud DNS** | Managed DNS for your own domain names | |
+| **VPC Network Peering** | Joins two separately managed VPCs so they talk over internal IPs | |
+| **Shared VPC** | One host project shares its VPC with other projects, with IAM deciding who can use which subnet | |
+| **Cloud VPN, Interconnect** | Private links between your on-premises network (or another cloud) and your VPC | |
 
-> **Key Idea:** the biggest difference from AWS: a Google Cloud VPC is **global** and its subnets are **regional**; an AWS VPC is regional and its subnets are zonal.
+> **Key Idea:** the one design difference worth remembering from AWS: a Google Cloud VPC is **global** and its subnets are **regional**.
 
 ---
 
@@ -244,13 +233,13 @@ Compute Engine is Google Cloud's IaaS: VMs on Google's infrastructure, configure
 
 High throughput between a VM and its persistent disks is the default, at no extra cost.
 
-| Option | What it is | AWS |
-| :--- | :--- | :--- |
-| **Zonal persistent disk** | Reliable network block storage in one zone; the common default | EBS |
-| **Regional persistent disk** | Block storage replicated across **two zones** of a region | (none) |
-| **Local SSD** | Very fast, physically attached, **data lost** when the VM stops | Instance store |
-| **Cloud Storage bucket** | Cheap object storage (Lab 3) | S3 |
-| **Filestore** | Managed high-performance file shares | EFS |
+| Option | What it is |
+| :--- | :--- |
+| **Zonal persistent disk** | Reliable network block storage in one zone; the common default |
+| **Regional persistent disk** | Block storage replicated across **two zones** of a region |
+| **Local SSD** | Very fast, physically attached, **data lost** when the VM stops |
+| **Cloud Storage bucket** | Cheap object storage (Lab 3), ≈ S3 |
+| **Filestore** | Managed high-performance file shares |
 
 If unsure, add a persistent disk.
 
@@ -259,7 +248,7 @@ If unsure, add a persistent disk.
 <a id="part-3"></a>
 ## PART 3 — Scaling VMs, VPC Peering and Shared VPC
 
-- **Autoscaling** adds or removes VMs based on load metrics such as CPU. It works on a **managed instance group (MIG)**, built from an **instance template** (≈ an AWS Auto Scaling group built from a launch template).
+- **Autoscaling** adds or removes VMs based on load metrics such as CPU. It works on a **managed instance group (MIG)**, built from an **instance template** .
 - A load balancer ([Part 4](#part-4)) spreads incoming traffic across the VMs in the group.
 
 | | VPC Network Peering | Shared VPC |
@@ -269,7 +258,6 @@ If unsure, add a persistent disk.
 | **Access control** | Both sides must configure the peering | **IAM** decides who in which project may use which subnet |
 | **Across organizations** | Yes | No, same organization |
 | **Rules** | No overlapping ranges; **not transitive** (A–B and B–C does not give A–C) | |
-| **AWS** | VPC peering | Shared subnets through AWS RAM |
 
 > **Key Idea:** pick Shared VPC for IAM-controlled, centrally managed networking inside one organization; pick peering to join two independently managed networks.
 
@@ -278,18 +266,18 @@ If unsure, add a persistent disk.
 <a id="part-4"></a>
 ## PART 4 — Cloud Load Balancing, Cloud DNS and Cloud CDN
 
-**Cloud Load Balancing (≈ Elastic Load Balancing)**
+**Cloud Load Balancing**
 
 - A fully distributed, software-defined, **managed** service: no VMs for you to run or scale.
 - Handles HTTP(S), TCP, SSL and UDP traffic.
 - Global load balancing gives **one front end (one IP) to the world** and balances across **multiple regions**, with automatic multi-region failover that shifts traffic gradually when backends become unhealthy.
 - **No pre-warming:** you do not warn Google before a traffic spike.
 
-| Load balancer | Layer | Traffic | Proxy or passthrough | Scope | AWS |
-| :--- | :---: | :--- | :--- | :--- | :--- |
-| **Application LB** | 7 | HTTP, HTTPS | Proxy (TLS termination, content-based routing) | External or internal; global, regional or cross-region | ALB |
-| **Proxy Network LB** | 4 | TCP (optional SSL offload) | Proxy: ends the client connection, opens a new one to the backend | External or internal; global, regional or cross-region | NLB (closest) |
-| **Passthrough Network LB** | 4 | TCP, UDP, ESP, ICMP and more | Passthrough: forwards packets, **keeps the client's source IP** | Regional, external or internal | NLB / Gateway LB |
+| Load balancer | Layer | Traffic | Proxy or passthrough | Scope |
+| :--- | :---: | :--- | :--- | :--- |
+| **Application LB** | 7 | HTTP, HTTPS | Proxy (TLS termination, content-based routing) | External or internal; global, regional or cross-region |
+| **Proxy Network LB** | 4 | TCP (optional SSL offload) | Proxy: ends the client connection, opens a new one to the backend | External or internal; global, regional or cross-region |
+| **Passthrough Network LB** | 4 | TCP, UDP, ESP, ICMP and more | Passthrough: forwards packets, **keeps the client's source IP** | Regional, external or internal |
 
 ```mermaid
 %%{init: {'theme':'base'}}%%
@@ -307,13 +295,13 @@ flowchart LR
 
 Clients inside the VPC only? Pick the **internal** variant of the same type.
 
-**Cloud DNS (≈ Route 53)**
+**Cloud DNS**
 
 - Google also runs the free public DNS resolver **8.8.8.8**.
 - **Cloud DNS** is a managed, low-latency, highly available DNS service for your own domains, served from redundant locations worldwide.
 - Programmable: manage millions of zones and records through the console, CLI or API.
 
-**Cloud CDN (≈ CloudFront)**
+**Cloud CDN** (≈ a CDN)
 
 - Uses Google's global **edge caches** to serve content near users: lower latency, less load on your origin, lower cost.
 - Turned on with **a single checkbox** once an Application Load Balancer is set up.
@@ -324,14 +312,14 @@ Clients inside the VPC only? Pick the **internal** variant of the same type.
 <a id="part-5"></a>
 ## PART 5 — Connecting other networks to a Google VPC
 
-| Option | How it connects | Private access to the VPC? | SLA | Bandwidth | AWS |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **Cloud VPN** | Encrypted IPsec tunnel over the internet; **Cloud Router** makes it dynamic with BGP | Yes | Yes (HA VPN up to 99.99%) | Limited by the internet link | Site-to-Site VPN |
-| **Direct Peering** | Your router in a Google **point of presence (PoP)**, 200+ worldwide | No, Google's public IPs only (Workspace, public APIs) | **No** | Your link | (none) |
-| **Carrier Peering** | Through a service provider's network to Google | No, public IPs only | **No** | Provider's | (none) |
-| **Dedicated Interconnect** | Your own physical circuit to Google in a colocation facility | Yes | **Up to 99.99%** with Google's recommended topology | 10 or 100 Gbps per link | Direct Connect (dedicated) |
-| **Partner Interconnect** | Through a supported service provider | Yes | **Up to 99.99%**; Google is not responsible for the provider's part | From 50 Mbps up | Direct Connect (hosted) |
-| **Cross-Cloud Interconnect** | Google provisions a dedicated physical link to another cloud | Yes, VPC to the other cloud's network | Yes | 10 or 100 Gbps | (none) |
+| Option | How it connects | Private access to the VPC? | SLA | Bandwidth |
+| :--- | :--- | :--- | :--- | :--- |
+| **Cloud VPN** | Encrypted IPsec tunnel over the internet; **Cloud Router** makes it dynamic with BGP | Yes | Yes (HA VPN up to 99.99%) | Limited by the internet link |
+| **Direct Peering** | Your router in a Google **point of presence (PoP)**, 200+ worldwide | No, Google's public IPs only (Workspace, public APIs) | **No** | Your link |
+| **Carrier Peering** | Through a service provider's network to Google | No, public IPs only | **No** | Provider's |
+| **Dedicated Interconnect** | Your own physical circuit to Google in a colocation facility | Yes | **Up to 99.99%** with Google's recommended topology | 10 or 100 Gbps per link |
+| **Partner Interconnect** | Through a supported service provider | Yes | **Up to 99.99%**; Google is not responsible for the provider's part | From 50 Mbps up |
+| **Cross-Cloud Interconnect** | Google provisions a dedicated physical link to another cloud | Yes, VPC to the other cloud's network | Yes | 10 or 100 Gbps |
 
 - **Cloud Router + BGP:** with dynamic routing, adding a subnet to the VPC automatically advertises it to the on-premises network.
 - Interconnect links can be **backed up by a VPN** for extra reliability.

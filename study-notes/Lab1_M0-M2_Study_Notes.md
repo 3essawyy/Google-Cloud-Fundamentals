@@ -542,6 +542,8 @@ flowchart TD
     3. The deny is narrowed with a condition so it only covers some resources.
 - **AWS version:** an Organizations SCP deny beats any Allow, even for an account admin. Only someone in the management account can change the SCP.
 
+**So who can delete the VM?** Nobody, until the deny changes. The deny blocks the *permission* for everyone it covers, an org admin included. It is a two-step fix: (1) someone with **Deny Admin** on the org (an Organization Administrator can grant it to themselves) deletes the deny or adds Bob or a break-glass group as an exception principal; (2) then Bob, as Owner, deletes the VM.
+
 > **Key Idea:** Owner plus a deny equals denied. Deny policies win over allow and are inherited down the hierarchy.
 
 #### Why does the Lab 1 site open? Firewall rules in detail
@@ -572,6 +574,16 @@ flowchart LR
 ```
 
 - **Both must be true** for the page to load: the firewall allows port 80, and something is listening on port 80.
+
+**Two doors, you need both open.** Picture the VM as an office building. Door 1 is the firewall rule (≈ the inbound rule of an AWS security group): the front gate. Door 2 is Apache listening on port 80 (≈ the web server on your EC2): the receptionist inside.
+
+| Firewall allows port 80? | Apache running? | Browser shows | Why |
+| :--- | :--- | :--- | :--- |
+| No | Yes | Spins forever, then **timeout** | The gate silently drops you |
+| Yes | No | Instant **connection refused** | You reached the building, the desk is empty |
+| Yes | Yes | **Page loads** | Both doors open |
+
+Spinning means Door 1 (firewall); an instant refusal means Door 2 (nothing listening).
 - **Debugging rule:** a **timeout** points to the firewall; **connection refused** means the traffic got through but nothing is listening.
 - **In Lab 1:** the Marketplace deploy form has a firewall section, and its defaults should leave HTTP traffic allowed (check it on the deploy page; the exact rule name may differ). The lab's exam anchor is to *verify the allow-http rule on port 80*. If the page won't open from a corporate laptop, try off the VPN or another device, as the lab says.
 - **Check it yourself** in Cloud Shell: `gcloud compute firewall-rules list`

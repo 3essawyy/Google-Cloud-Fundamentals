@@ -50,5 +50,6 @@ Execute labs progressively from easiest to hardest:
   * `M*_v2.md`: **Recommended photo-free study guide** with synthesized Mermaid architecture diagrams.
   * `M*.md`: Verbose version with extracted `.png` slide images and `media/` folder.
 * `labs/`: Standardized Markdown lab manuals (`01` through `04`) and master `LAB_ROADMAP.md`.
+* `study-notes/`: High-yield bridge notes (e.g. `Lab1_M0-M2_Study_Notes.md`) synthesized with Claude Web.
 * `scripts/`: Conversion engines, Cloud Shell `.sh` scripts, and Claude Web prompt.
 * `sessions/`: Milestone reviews, decision logs, and session activity tracking.

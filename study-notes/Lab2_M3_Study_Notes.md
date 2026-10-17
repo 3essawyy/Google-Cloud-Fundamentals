@@ -908,4 +908,41 @@ Partly. **`mynetwork-allow-custom`**, source **`10.128.0.0/9`** (the whole auto 
 
 </details>
 
-**Score:** Round 1: 3 of 4 · Round 2: 2 right, 2 partial · Round 3: 1 of 2 · Round 4: 2 of 4. **Weak spots to revisit:** firewall ingress vs egress, load balancer choice, Shared VPC vs peering.
+#### Round 5 (subnets)
+
+<details>
+<summary><strong>R5-Q1.</strong> How many addresses does a `/24` have, and how many can VMs use?</summary>
+
+✅ 2^8 = 256 addresses. Google reserves 4, so **252** usable (the first two and the last two).
+
+</details>
+
+<details>
+<summary><strong>R5-Q2.</strong> What range does `10.5.0.0/20` cover, and what is the next `/20` block?</summary>
+
+Partly. It covers `10.5.0.0` to **`10.5.15.255`** (a `/20` leaves 4 free bits in the third octet, so it spans 16 values, 0 to 15). `10.5.16.0` is where the **next** block starts: `10.5.16.0/20`, ending at `10.5.31.255`.
+
+</details>
+
+<details>
+<summary><strong>R5-Q3.</strong> Do `10.0.0.0/16` and `10.0.200.0/24` overlap? And `10.1.0.0/16` and `10.2.0.0/16`?</summary>
+
+First pair: **yes**. `10.0.0.0/16` fixes the first two octets (`10.0`), so it covers `10.0.0.0` to `10.0.255.255`; `10.0.200.0/24` is `10.0.200.0` to `10.0.200.255`, entirely inside. Second pair: **no**. Their fixed parts differ (`10.1` vs `10.2`), so the blocks are separate. Method: compare the fixed bits of the **shorter** prefix; if the other block starts with the same bits, it nests inside.
+
+</details>
+
+<details>
+<summary><strong>R5-Q4.</strong> A `/20` subnet is nearly full. What can you do, and what can't you do?</summary>
+
+✅ **Expand** it (for example `gcloud compute networks subnets expand-ip-range NAME --region=REGION --prefix-length=19`), never shrink. Expansion is permanent and can't run into another subnet's range.
+
+</details>
+
+<details>
+<summary><strong>R5-Q5.</strong> Two VMs in zones `a` and `b` of one region: how many subnets?</summary>
+
+✅ **One**. A subnet is regional and spans all the zones of its region.
+
+</details>
+
+**Score:** Round 1: 3 of 4 · Round 2: 2 right, 2 partial · Round 3: 1 of 2 · Round 4: 2 of 4 · Round 5 (subnets): 3 right, 2 partial. **Weak spots to revisit:** firewall ingress vs egress, load balancer choice, Shared VPC vs peering, and reading CIDR ranges (find where a block ends and test overlap).

@@ -9,6 +9,7 @@
 ## Table of Contents
 
 - [PART 0 — Course introduction (M0)](#part-0)
+- [Google Cloud ↔ AWS cheat sheet](#part-aws)
 - [PART 1 — Introducing Google Cloud (M1)](#part-1)
   - [1.1 Cloud computing: the 5 traits](#part-1-1)
   - [1.2 Service models](#part-1-2)
@@ -27,6 +28,9 @@
   - [2.7 Four ways to work with Google Cloud](#part-2-7)
   - [2.8 M2 self-check quiz](#part-2-8)
 - [PART 3 — Bridge to Lab 1: Cloud Marketplace LAMP](#part-3)
+- [PART 4 — Grill log: questions, slips and fixes](#part-4)
+  - [4.1 Deep dives on the slips](#part-4-1)
+  - [4.2 The questions, round by round](#part-4-2)
 
 ---
 
@@ -37,6 +41,41 @@
 > A lab gives you a temporary project and student account for a fixed time, and **it cannot be paused**. Start a lab only when you have a continuous block of time.
 
 Everything below keeps what Lab 1 or the Associate Cloud Engineer (ACE) exam needs. Cut: etiquette and agenda slides, repeated section dividers, product history detail, sustainability marketing, TensorFlow, and the mobile app's feature list.
+
+---
+
+<a id="part-aws"></a>
+## Google Cloud ↔ AWS cheat sheet
+
+If you know AWS, map each Google Cloud name to the service you already know.
+
+| Google Cloud | AWS equivalent | Note |
+| :--- | :--- | :--- |
+| **Organization node** | AWS Organizations (root) | Top of the hierarchy |
+| **Folder** | Organizational Unit (OU) | Groups projects / accounts |
+| **Project** | AWS account | Closest match; in GCP each service's API must be enabled per project |
+| **IAM** | IAM | GCP grants roles on a resource-hierarchy level; AWS attaches policies to identities |
+| **Service account** | IAM role for EC2 (instance profile) | Identity for software, not people |
+| **Cloud Identity** | IAM Identity Center | Central users and groups |
+| **Compute Engine** | EC2 | IaaS VMs, per-second billing |
+| **App Engine** | Elastic Beanstalk | PaaS: deploy code, platform runs it |
+| **Cloud Run** | App Runner / ECS on Fargate | Serverless containers (Lab 4) |
+| **Cloud Run functions** | Lambda | Event-driven functions |
+| **GKE** | EKS | Managed Kubernetes |
+| **Cloud Storage** | S3 | Object storage (Lab 3) |
+| **Cloud SQL** | RDS | Managed MySQL / PostgreSQL / SQL Server (Lab 3) |
+| **BigQuery** | Redshift / Athena | Analytics warehouse |
+| **Dataproc** | EMR | Managed Spark / Hadoop |
+| **VPC network** | VPC | GCP VPC is **global** with regional subnets; AWS VPC is regional (Lab 2) |
+| **Firewall rules** | Security groups / NACLs | Lab 1 and 2 |
+| **Cloud Marketplace** | AWS Marketplace | Lab 1 |
+| **Artifact Registry** | ECR | Lab 4 |
+| **Cloud Build** | CodeBuild | Lab 4 |
+| **Cloud Shell / gcloud** | CloudShell / AWS CLI | |
+| **Budgets, quotas** | AWS Budgets, Service Quotas | |
+| **Cloud Monitoring / Logging** | CloudWatch | |
+
+> **Key Idea:** The biggest mindset change from AWS: in Google Cloud the **project** is the unit for billing, API enablement and IAM, and a **VPC is global**.
 
 ---
 
@@ -465,6 +504,237 @@ Pre-authenticated with the SDK preinstalled, and a persistent 5 GB home director
 | Open the Site URL | A **firewall rule allows HTTP (tcp:80)** to the VM's external IP |
 
 > **Key Idea:** Patching the VM's OS and software is your job, not Google's: that is the IaaS side of shared responsibility.
+
+---
+
+<a id="part-4"></a>
+## PART 4 — Grill log: questions, slips and fixes
+
+Four grill rounds on 2026-10-17. Part 4.1 expands the concepts behind the slips; 4.2 lists every question with its answer, so you can re-quiz yourself one dropdown at a time.
+
+<a id="part-4-1"></a>
+### 4.1 Deep dives on the slips
+
+#### Bob is Owner, but an org-level deny exists. How does he delete a VM?
+
+**He can't.** Console, `gcloud` and the API all check the same permission, `compute.instances.delete`, so every route is blocked.
+
+```mermaid
+%%{init: {'theme':'base'}}%%
+flowchart TD
+    R["Request: Bob deletes a VM"] --> D{"Does any deny policy from the org,<br/>folder, project or resource match<br/>Bob and this permission?"}
+    D -->|"yes"| X["DENIED<br/>allow policies are never checked"]
+    D -->|"no"| A{"Does the union of Bob's allow grants<br/>include the permission?"}
+    A -->|"yes"| OK["ALLOWED"]
+    A -->|"no"| N["DENIED<br/>nothing grants it"]
+    style R fill:#1a1a2e,stroke:#e94560,color:#ffffff
+    style D fill:#16213e,stroke:#0f3460,color:#ffffff
+    style A fill:#16213e,stroke:#0f3460,color:#ffffff
+    style X fill:#2d3436,stroke:#e94560,color:#ffffff
+    style N fill:#2d3436,stroke:#e94560,color:#ffffff
+    style OK fill:#2d3436,stroke:#00b894,color:#ffffff
+```
+
+- **Why Owner doesn't help:** Owner is an *allow* grant on the project. IAM evaluates deny policies first, and a deny set on the org is inherited by everything below it. A project Owner has no power over the org's deny policy.
+- **What would make the delete possible** (all done by someone with the right at the org level, not by Bob):
+    1. A person with the **Deny Admin** role on the org removes the deny policy.
+    2. The deny policy is edited to list Bob, or a break-glass group, as an **exception principal**: the deny then applies to everyone except them.
+    3. The deny is narrowed with a condition so it only covers some resources.
+- **AWS version:** an Organizations SCP deny beats any Allow, even for an account admin. Only someone in the management account can change the SCP.
+
+> **Key Idea:** Owner plus a deny equals denied. Deny policies win over allow and are inherited down the hierarchy.
+
+#### Why does the Lab 1 site open? Firewall rules in detail
+
+A VM can have an external IP and still be unreachable, because a VPC firewall sits in front of it.
+
+- Every VPC has two **implied rules**: *deny all ingress* and *allow all egress*. They have the lowest priority and can't be deleted.
+- Anything else you must allow with a rule. A rule has a **direction** (ingress or egress), a **priority** (a lower number wins), an **action** (allow or deny), a **target** (all instances, a network tag, or a service account), a **source** (IP ranges) and a **protocol and port**.
+- Rules are **stateful**: if a request is allowed in, the reply is allowed out automatically.
+- **AWS version:** closest to security groups plus NACLs in one: a rule can allow or deny, is set at VPC level, and picks its VMs with tags. Lab 2 builds these by hand.
+
+```mermaid
+%%{init: {'theme':'base'}}%%
+flowchart LR
+    B["Your browser"] -->|"http to the VM's external IP, port 80"| F{"VPC firewall:<br/>does an ingress rule allow tcp:80?"}
+    F -->|"no rule"| T["Dropped silently<br/>browser times out"]
+    F -->|"allowed"| V["VM"]
+    V --> P{"Is Apache listening<br/>on port 80?"}
+    P -->|"no"| RF["Connection refused"]
+    P -->|"yes"| S["Page served"]
+    style B fill:#1a1a2e,stroke:#e94560,color:#ffffff
+    style F fill:#16213e,stroke:#0f3460,color:#ffffff
+    style V fill:#0f3460,stroke:#533483,color:#ffffff
+    style P fill:#16213e,stroke:#0f3460,color:#ffffff
+    style T fill:#2d3436,stroke:#e94560,color:#ffffff
+    style RF fill:#2d3436,stroke:#e94560,color:#ffffff
+    style S fill:#2d3436,stroke:#00b894,color:#ffffff
+```
+
+- **Both must be true** for the page to load: the firewall allows port 80, and something is listening on port 80.
+- **Debugging rule:** a **timeout** points to the firewall; **connection refused** means the traffic got through but nothing is listening.
+- **In Lab 1:** the Marketplace deploy form has a firewall section, and its defaults should leave HTTP traffic allowed (check it on the deploy page; the exact rule name may differ). The lab's exam anchor is to *verify the allow-http rule on port 80*. If the page won't open from a corporate laptop, try off the VPN or another device, as the lab says.
+- **Check it yourself** in Cloud Shell: `gcloud compute firewall-rules list`
+
+#### App Engine, Compute Engine and Cloud Run functions side by side
+
+| | Compute Engine (≈ EC2) | App Engine (≈ Elastic Beanstalk) | Cloud Run functions (≈ Lambda) |
+| :--- | :--- | :--- | :--- |
+| **Model** | IaaS | PaaS | Serverless functions |
+| **You deploy** | A VM you configure | Your app code plus an `app.yaml` | One function |
+| **You manage** | OS, runtime, scaling, patches | Only the app | Only the function |
+| **Scaling** | You set it up | Automatic; the standard environment can scale to zero | Automatic, per event |
+| **You pay for** | Resources allocated, per second | Resources used | Per invocation |
+
+Example, a small Python Flask blog: on Compute Engine you build the VM, install Python and a web server, deploy and patch it; on App Engine you run `gcloud app deploy` and Google provisions, scales and patches the servers; with Cloud Run functions you deploy single handlers that run only when a request or event arrives.
+
+#### Why enabling an API happens per project
+
+Every service's API starts **off in each new project**. Lab 1's prompt to enable the Compute Engine API turns it on for that one project only, not for the folder or org above it, or for other projects. AWS has no real equivalent: think of a project as an AWS account where you tick the services you want before using them.
+
+#### Where custom roles are created and where roles are granted
+
+| | Where |
+| :--- | :--- |
+| **Create (define) a custom role** | Organization or project only, never a folder |
+| **Grant any role** | Organization, folder, project or a single resource |
+
+To give every project under the Engineering folder a "vmOperator" role: create it on the **organization**, then grant it on the **folder**, and it flows down.
+
+<a id="part-4-2"></a>
+### 4.2 The questions, round by round
+
+<details>
+<summary><strong>R1 Q1.</strong> You deploy one VM in one zone and that zone goes down. What should you have done, and what changes if a whole region goes down?</summary>
+
+Spread VMs across several zones of the region, so one zone failing leaves the others running. For a whole-region failure, also run in several regions. Several VMs in the same zone fail together.
+
+</details>
+
+<details>
+<summary><strong>R1 Q2.</strong> Compute Engine and App Engine: which is IaaS and which is PaaS, and how does each bill?</summary>
+
+Compute Engine is IaaS (≈ EC2): you pay for what you allocate, per second. App Engine is PaaS (≈ Elastic Beanstalk): you pay for what you use. The Lambda equivalent is Cloud Run functions.
+
+</details>
+
+<details>
+<summary><strong>R1 Q3.</strong> Bob has Viewer on the org, Editor on a folder, and a deny on <code>compute.instances.delete</code>. What can he do to a VM in a project inside that folder?</summary>
+
+Everything Editor allows except delete: his grants are the union of Viewer and Editor, and the deny wins on delete. Outside that folder he only inherits the org grant, so he is just a Viewer there.
+
+</details>
+
+<details>
+<summary><strong>R1 Q4.</strong> Lab 1 asks you to enable the Compute Engine API. Why, and at which level does it apply?</summary>
+
+Every service's API starts off in each new project. Enabling it applies to that one project only.
+
+</details>
+
+<details>
+<summary><strong>R2 Q1.</strong> The project is named "blog-test" and its ID is <code>blog-test-48213</code>. Which can you rename, and which do gcloud commands use?</summary>
+
+You can rename the name; the ID is fixed forever. gcloud uses the ID: `gcloud config set project blog-test-48213`. The ID is like an S3 bucket name: globally unique and unchangeable.
+
+</details>
+
+<details>
+<summary><strong>R2 Q2.</strong> An app on a VM must write files to a bucket with no person logging in. What identity should it use?</summary>
+
+A service account attached to the VM (≈ an IAM role on an EC2 instance profile), authenticating with keys, not a password.
+
+</details>
+
+<details>
+<summary><strong>R2 Q3.</strong> You set a &#36;50 budget and spend reaches &#36;80. What did Google do?</summary>
+
+It only sent alerts. Budgets never stop spending (same as AWS Budgets).
+
+</details>
+
+<details>
+<summary><strong>R2 Q4.</strong> You get "quota exceeded" after creating your 15th VPC network, and later after a burst of API calls. Which quota types?</summary>
+
+The 15th VPC is an **allocation** quota (a cap on how many). The burst of calls is a **rate** quota (a cap per time window that resets). Both are per project.
+
+</details>
+
+<details>
+<summary><strong>R3 Q1.</strong> You need a custom role "vmOperator" in every project under the Engineering folder. Where do you create it?</summary>
+
+On the **organization**. A custom role can't be created on a folder; create it on the org, then grant it on the folder.
+
+</details>
+
+<details>
+<summary><strong>R3 Q2.</strong> Which tool gives a browser terminal with gcloud installed and logged in?</summary>
+
+Cloud Shell (≈ AWS CloudShell).
+
+</details>
+
+<details>
+<summary><strong>R3 Q3.</strong> A legacy app needs full OS control and per-second billing. Which service?</summary>
+
+Compute Engine (≈ EC2).
+
+</details>
+
+<details>
+<summary><strong>R3 Q4.</strong> Your Cloud Storage files are encrypted on disk with no configuration. Which security layer?</summary>
+
+Storage services (encryption at rest by default).
+
+</details>
+
+<details>
+<summary><strong>R4 Q1.</strong> Bob is Owner on a project, but a deny policy on the org blocks <code>compute.instances.delete</code>. Can he delete a VM?</summary>
+
+No. Deny is checked before allow, and the org-level deny is inherited down. Bob can't remove it himself; see 4.1.
+
+</details>
+
+<details>
+<summary><strong>R4 Q2.</strong> Which org-level role controls who can create projects, and so who can spend money?</summary>
+
+Project Creator.
+
+</details>
+
+<details>
+<summary><strong>R4 Q3.</strong> Alice should manage a service account, Bob should only see it. How?</summary>
+
+Give each a role *on the service account itself*, because a service account is also a resource.
+
+</details>
+
+<details>
+<summary><strong>R4 Q4.</strong> An employee leaves. Where do you disable their account and remove them from all groups at once?</summary>
+
+Cloud Identity, in the Google Admin console (≈ IAM Identity Center).
+
+</details>
+
+<details>
+<summary><strong>R4 Q5.</strong> A VM runs the whole month. What discount applies automatically?</summary>
+
+The sustained use discount.
+
+</details>
+
+<details>
+<summary><strong>R4 Q6.</strong> Why does the Lab 1 LAMP site open in your browser?</summary>
+
+A firewall rule allows HTTP (tcp:80) to the VM's external IP, and Apache is listening on port 80. See the firewall deep dive in 4.1.
+
+</details>
+
+### 4.3 Three things to remember
+
+1. Deny beats allow, and it is inherited down the tree.
+2. Roles can be granted on anything, including a service account; custom roles are created only on an org or a project.
+3. A VM is reachable only if a firewall rule lets the traffic in, and something is listening on that port.
 
 ---
 *Scope: Google Cloud Fundamentals: Core Infrastructure, modules M0 to M2 · Mirrors the Claude Doc linked at the top; changes go into both.*

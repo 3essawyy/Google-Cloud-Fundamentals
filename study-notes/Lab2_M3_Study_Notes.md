@@ -442,9 +442,9 @@ The sustained use discount, automatic once the VM runs more than 25% of the mont
 </details>
 
 <details>
-<summary><strong>Q12.</strong> Your company needs private, high-bandwidth access to Google Cloud but cannot put equipment in a Google PoP. Which option?</summary>
+<summary><strong>Q12.</strong> Your company needs private access to Google Cloud, its internet link is too slow or unreliable for the traffic, and it cannot put equipment in a Google PoP. Which option, and why not Cloud VPN?</summary>
 
-Partner Interconnect.
+Partner Interconnect. Cloud VPN is private too, but it runs over the public internet, so it is only the answer when your current connection is good enough. Here it isn't, and without a PoP presence the dedicated link has to come through a provider.
 
 </details>
 

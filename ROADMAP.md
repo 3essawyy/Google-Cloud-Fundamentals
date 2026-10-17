@@ -18,7 +18,7 @@ One lab a day after its theory, about 2.5 hours each evening; Wednesday is only 
 
 | Day | Theory first | Then the lab | Time |
 | --- | --- | --- | --- |
-| Sat 17 Oct | M0 Course Intro, M1 Introducing Google Cloud, M2 Resources and Access | Lab 1: Cloud Marketplace (LAMP) | ~2.5 h |
+| Sat 17 Oct | M0 Course Intro, M1 Introducing Google Cloud, M2 Resources and Access | Lab 1: Cloud Marketplace (LAMP) | ~2.5 h (**done**) |
 | Sun 18 Oct | M3 Virtual Machines and Networks | Lab 2: VPC Networking and Compute Engine | ~2.5 h |
 | Mon 19 Oct | M4 Storage in the Cloud | Lab 3: Cloud Storage and Cloud SQL | ~3 h |
 | Tue 20 Oct | M5 Containers in the Cloud, M6 Applications in the Cloud | Lab 4: Hello Cloud Run | ~2.5 h |
@@ -26,19 +26,27 @@ One lab a day after its theory, about 2.5 hours each evening; Wednesday is only 
 
 If a day slips, do two labs the next day; Labs 1 and 2 are the shortest, so they are the safest to double up.
 
+## Progress log
+
+| Date (Cairo) | Done | Notes |
+| --- | --- | --- |
+| Sat 17 Oct | Lab 1 (LAMP on Compute Engine) completed, all checks green | First deploy failed with a `setIamPolicy` permission error (probably propagation delay); redeploying worked. Lab 1 notes (M0 to M2) with quizzes and a four-round grill log written. |
+
+**Next:** Sun 18 Oct, M3 notes and Lab 2 (VPC Networking and Compute Engine).
+
 ## Lab checklists
 
 ### Lab 1: Getting Started with Cloud Marketplace (~30 min, Console only)
 
 Theory: [M1](modules/M1_Introducing_Google_Cloud/M1_Introducing_Google_Cloud_v2.md), [M2](modules/M2_Resources_and_Access/M2_Resources_and_Access_v2.md). Manual: [labs/01_Cloud_Marketplace.md](labs/01_Cloud_Marketplace.md).
 
-- [ ] Read M0, M1, M2 study guides
-- [ ] Start lab, open console in incognito with the lab student account
-- [ ] Task 2: Marketplace > search `LAMP` > **LAMP Stack by Google Click to Deploy** > Get started > Agree > Deploy
-- [ ] Zone = the lab's zone, Series E2, machine type `e2-medium`, Deploy (enable Compute Engine and Infrastructure Manager APIs if asked)
-- [ ] Wait for "lamp-1 has been deployed", then Check my progress
-- [ ] Task 3: `lamp-1-vm` > Details > open the Site URL and see the Apache congratulations page
-- [ ] All checks green, End Lab
+- [x] Read M0, M1, M2 study guides
+- [x] Start lab, open console in incognito with the lab student account
+- [x] Task 2: Marketplace > search `LAMP` > **LAMP Stack by Google Click to Deploy** > Get started > Agree > Deploy
+- [x] Zone = the lab's zone, Series E2, machine type `e2-medium`, Deploy (enable Compute Engine and Infrastructure Manager APIs if asked)
+- [x] Wait for "lamp-1 has been deployed", then Check my progress
+- [x] Task 3: `lamp-1-vm` > Details > open the Site URL and see the Apache congratulations page
+- [x] All checks green, End Lab
 
 No commands needed. Optional check you can paste in Cloud Shell:
 

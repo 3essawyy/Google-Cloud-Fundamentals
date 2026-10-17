@@ -122,6 +122,41 @@ flowchart TD
 | **Internet communication** | Google Front End (GFE) terminates TLS with proper certificates and perfect forward secrecy; multi-layer DoS protection |
 | **Operational security** | Intrusion detection and Red Team exercises; limited and monitored admin access; U2F keys for all employees; central source control with two-party code review; bug bounty |
 
+**Analogy:** a bank doesn't rely on one wall. It has guards at the door, ID checks, a vault and cameras, so getting past one layer still leaves the others.
+
+**Worked example:** you open your Lab 3 blog, which shows an image stored in Cloud Storage. The request meets every layer:
+
+```mermaid
+%%{init: {'theme':'base'}}%%
+flowchart LR
+    U["You<br/>browser"] --> G["1. Internet communication<br/>GFE: TLS + DoS absorbed"]
+    G --> I["2. User identity<br/>risk checks, security key"]
+    I --> S["3. Service deployment<br/>encrypted RPC between services"]
+    S --> D["4. Storage services<br/>image encrypted at rest"]
+    D --> H["5. Hardware<br/>secure boot, guarded building"]
+    H -.-> O["6. Operational security<br/>monitored staff, two-person code review"]
+    style U fill:#1a1a2e,stroke:#e94560,color:#ffffff
+    style G fill:#16213e,stroke:#0f3460,color:#ffffff
+    style I fill:#16213e,stroke:#0f3460,color:#ffffff
+    style S fill:#16213e,stroke:#0f3460,color:#ffffff
+    style D fill:#0f3460,stroke:#533483,color:#ffffff
+    style H fill:#2d3436,stroke:#6c5ce7,color:#ffffff
+    style O fill:#2d3436,stroke:#6c5ce7,color:#ffffff
+```
+
+1. **Internet communication:** your browser reaches the Google Front End first; it handles HTTPS and soaks up DoS floods before anything reaches the app.
+2. **User identity:** signing in to the console, Google checks risk signals (new device or country) and can ask for a second factor such as a security key.
+3. **Service deployment:** as Google's services pass your request between data centers, that internal RPC traffic is encrypted.
+4. **Storage services:** the image sits on disk encrypted at rest by default, with nothing for you to turn on.
+5. **Hardware:** the server runs Google-designed chips and a secure boot stack, so tampered software won't boot; the building has layered physical security.
+6. **Operational security:** staff who could touch that server have limited, monitored access and use security keys; changes to its code need two-person review.
+
+> [!IMPORTANT]
+> **What the ACE exam tests here:**
+> - Encryption at rest and in transit is **on by default**. An answer like "enable encryption on the bucket" as an extra step is usually a trap.
+> - **Shared responsibility:** Google secures these six layers; you secure yours: IAM roles, firewall rules, patching your VM's OS, and keys if you choose to manage them.
+> - You won't be asked to recite the six layers in order; know that each exists.
+
 <a id="part-1-5"></a>
 ### 1.5 Open APIs and open source
 

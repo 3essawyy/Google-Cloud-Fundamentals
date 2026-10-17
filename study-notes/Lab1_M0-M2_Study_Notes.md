@@ -9,6 +9,7 @@
 ## Table of Contents
 
 - [PART 0 — Course introduction (M0)](#part-0)
+- [Google Cloud ↔ AWS cheat sheet](#part-aws)
 - [PART 1 — Introducing Google Cloud (M1)](#part-1)
   - [1.1 Cloud computing: the 5 traits](#part-1-1)
   - [1.2 Service models](#part-1-2)
@@ -37,6 +38,41 @@
 > A lab gives you a temporary project and student account for a fixed time, and **it cannot be paused**. Start a lab only when you have a continuous block of time.
 
 Everything below keeps what Lab 1 or the Associate Cloud Engineer (ACE) exam needs. Cut: etiquette and agenda slides, repeated section dividers, product history detail, sustainability marketing, TensorFlow, and the mobile app's feature list.
+
+---
+
+<a id="part-aws"></a>
+## Google Cloud ↔ AWS cheat sheet
+
+If you know AWS, map each Google Cloud name to the service you already know.
+
+| Google Cloud | AWS equivalent | Note |
+| :--- | :--- | :--- |
+| **Organization node** | AWS Organizations (root) | Top of the hierarchy |
+| **Folder** | Organizational Unit (OU) | Groups projects / accounts |
+| **Project** | AWS account | Closest match; in GCP each service's API must be enabled per project |
+| **IAM** | IAM | GCP grants roles on a resource-hierarchy level; AWS attaches policies to identities |
+| **Service account** | IAM role for EC2 (instance profile) | Identity for software, not people |
+| **Cloud Identity** | IAM Identity Center | Central users and groups |
+| **Compute Engine** | EC2 | IaaS VMs, per-second billing |
+| **App Engine** | Elastic Beanstalk | PaaS: deploy code, platform runs it |
+| **Cloud Run** | App Runner / ECS on Fargate | Serverless containers (Lab 4) |
+| **Cloud Run functions** | Lambda | Event-driven functions |
+| **GKE** | EKS | Managed Kubernetes |
+| **Cloud Storage** | S3 | Object storage (Lab 3) |
+| **Cloud SQL** | RDS | Managed MySQL / PostgreSQL / SQL Server (Lab 3) |
+| **BigQuery** | Redshift / Athena | Analytics warehouse |
+| **Dataproc** | EMR | Managed Spark / Hadoop |
+| **VPC network** | VPC | GCP VPC is **global** with regional subnets; AWS VPC is regional (Lab 2) |
+| **Firewall rules** | Security groups / NACLs | Lab 1 and 2 |
+| **Cloud Marketplace** | AWS Marketplace | Lab 1 |
+| **Artifact Registry** | ECR | Lab 4 |
+| **Cloud Build** | CodeBuild | Lab 4 |
+| **Cloud Shell / gcloud** | CloudShell / AWS CLI | |
+| **Budgets, quotas** | AWS Budgets, Service Quotas | |
+| **Cloud Monitoring / Logging** | CloudWatch | |
+
+> **Key Idea:** The biggest mindset change from AWS: in Google Cloud the **project** is the unit for billing, API enablement and IAM, and a **VPC is global**.
 
 ---
 

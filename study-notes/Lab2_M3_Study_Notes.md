@@ -712,6 +712,75 @@ Clue words: "**share** one VPC", "IAM controls who uses which subnet", "central 
 
 **The basis:** peering merges two networks' routing tables into one view, so every address must mean one thing. Every auto mode VPC puts a `/20` subnet in **every** region, all from `10.128.0.0/9`, so the ranges are identical in every auto mode network. Using different regions for your VMs changes nothing, since the subnets exist in all regions anyway. Custom mode VPCs peer fine as long as their chosen ranges don't overlap. The VPC itself is global, so the regions of the VMs never matter.
 
+#### 8. Subnets from first principles
+
+You've done networking, so this is a refresher with the Google Cloud specifics added. Everything about subnets follows from three ideas: **CIDR arithmetic**, **a subnet is a block of addresses tied to a region**, and **blocks may never overlap**.
+
+**Step 1: read a CIDR block.** `10.128.0.0/20` means the first **20 of 32 bits are fixed** (the network part) and the remaining **12 bits are free** (the host part).
+
+| Prefix | Host bits | Addresses | Example |
+| :--- | :---: | :---: | :--- |
+| `/24` | 8 | 256 | `10.0.5.0/24` = `10.0.5.0` to `10.0.5.255` |
+| `/20` | 12 | 4,096 | `10.128.0.0/20` = `10.128.0.0` to `10.128.15.255` |
+| `/16` | 16 | 65,536 | `10.0.0.0/16` = `10.0.0.0` to `10.0.255.255` |
+| `/9` | 23 | 8,388,608 | `10.128.0.0/9` = `10.128.0.0` to `10.255.255.255` |
+
+Each step **shorter** in the prefix **doubles** the block: `/21` is twice a `/20`. A `/20` steps through the third octet in jumps of 16 (`10.128.0.0`, `10.128.16.0`, `10.128.32.0`, ...), which is how the next auto mode subnet starts at `10.128.16.0`.
+
+**Step 2: what a VM actually gets.** Google reserves **4 addresses in every subnet's primary range**, so a `/20` has 4,096 - 4 = **4,092 usable** addresses.
+
+| Address in `10.128.0.0/20` | Reserved for |
+| :--- | :--- |
+| `10.128.0.0` | Network address |
+| `10.128.0.1` | The subnet's default gateway |
+| `10.128.0.2` | **First address a VM can get** (this matches the `10.128.0.2` in the course slide) |
+| `10.128.15.254` | Reserved by Google |
+| `10.128.15.255` | Broadcast |
+
+**Step 3: why the subnet is regional.** The subnet is a range plus a gateway that exists for the **whole region**. A VM in zone `a` and a VM in zone `b` of the same region both take addresses from the same range and use the same gateway, so zones need no network setup of their own. This is the design difference from EC2: there a subnet lives in one Availability Zone, so you create one per zone.
+
+**Step 4: what the VPC does with subnets.**
+- Google creates a **subnet route** for every subnet automatically, so VMs in different subnets of one VPC can already reach each other. No router, no route table to build.
+- **Firewall rules are not per subnet.** They belong to the VPC and pick VMs by tag or service account, so putting two VMs in different subnets neither allows nor blocks anything by itself.
+- A VM's internal IP comes from the subnet of the **region you pick** when creating it.
+
+```mermaid
+%%{init: {'theme':'base'}}%%
+flowchart TB
+    subgraph V["VPC mynetwork: one global network, one address plan"]
+        subgraph R1["Region us-central1: subnet 10.128.0.0/20"]
+            A["VM zone a<br/>10.128.0.2"]
+            B["VM zone b<br/>10.128.0.3"]
+        end
+        subgraph R2["Another region: subnet 10.132.0.0/20"]
+            C["VM<br/>10.132.0.2"]
+        end
+    end
+    A <-->|"same subnet, same gateway"| B
+    A <-->|"subnet routes: automatic, no VPN"| C
+    style V fill:#1a1a2e,stroke:#e94560,color:#ffffff
+    style R1 fill:#16213e,stroke:#0f3460,color:#ffffff
+    style R2 fill:#16213e,stroke:#0f3460,color:#ffffff
+    style A fill:#2d3436,stroke:#00b894,color:#ffffff
+    style B fill:#2d3436,stroke:#00b894,color:#ffffff
+    style C fill:#2d3436,stroke:#00b894,color:#ffffff
+```
+
+**Step 5: the overlap rule.** CIDR blocks either **nest** (one sits entirely inside another) or are **completely separate**; they never partially overlap. So the overlap test is simple: does one block contain the other?
+
+| Pair | Overlap? | Why |
+| :--- | :---: | :--- |
+| `10.0.0.0/16` and `10.0.5.0/24` | Yes | The `/24` sits inside the `/16` |
+| `10.0.0.0/16` and `10.1.0.0/16` | No | Different second octet: separate blocks |
+| `10.128.0.0/20` and `10.128.16.0/20` | No | Back to back, one ends at `.15.255`, the next starts at `.16.0` |
+| `10.128.0.0/9` (auto mode) and `10.200.0.0/16` | Yes | `10.200.x.x` is inside `10.128.0.0` to `10.255.255.255` |
+
+Two places this rule bites: **inside one VPC** (two subnets can't overlap) and **between peered or connected networks** (VPC peering, Cloud VPN and Interconnect all need non-overlapping ranges, which is why auto mode is wrong for anything you will connect).
+
+**Step 6: growing a subnet.** Expanding `10.0.0.0/20` to `10.0.0.0/16` keeps the same starting address and just makes the block bigger, so every existing VM address is still inside it. It only works if the larger block doesn't run into another subnet. Shrinking would cut addresses a VM may already hold, so it is never allowed.
+
+> **Key Idea:** a subnet is *a range of addresses for one region*. The range decides how many VMs fit, the region decides where they live, and no two ranges in networks that must talk to each other may overlap.
+
 <a id="part-8-2"></a>
 ### 8.2 Questions you asked
 

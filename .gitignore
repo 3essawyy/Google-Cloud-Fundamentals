@@ -1,0 +1,28 @@
+# Raw course binaries & HTML downloads
+raw_materials/
+
+# Extracted slide screenshots & images (v2 notes are text & Mermaid only)
+modules/*/media/
+**/media/
+*.png
+*.jpg
+*.jpeg
+*.gif
+
+# Manifests
+images_manifest.json
+
+# Operating System & IDE artifacts
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+# Python cache & environment
+__pycache__/
+*.pyc
+*.pyo
+.env
+venv/
+.venv/

@@ -32,6 +32,10 @@
   - [7.2 Checklist](#part-7-2)
   - [7.3 Expected results](#part-7-3)
   - [7.4 Commands for the Gemini CLI agent](#part-7-4)
+- [PART 8 — Grill log: questions, slips and the reasoning behind them](#part-8)
+  - [8.1 Deep dives on the slips](#part-8-1)
+  - [8.2 Questions you asked](#part-8-2)
+  - [8.3 The questions, round by round](#part-8-3)
 
 ---
 
@@ -442,9 +446,9 @@ The sustained use discount, automatic once the VM runs more than 25% of the mont
 </details>
 
 <details>
-<summary><strong>Q12.</strong> Your company needs private, high-bandwidth access to Google Cloud but cannot put equipment in a Google PoP. Which option?</summary>
+<summary><strong>Q12.</strong> Your company needs private access to Google Cloud, its internet link is too slow or unreliable for the traffic, and it cannot put equipment in a Google PoP. Which option, and why not Cloud VPN?</summary>
 
-Partner Interconnect.
+Partner Interconnect. Cloud VPN is private too, but it runs over the public internet, so it is only the answer when your current connection is good enough. Here it isn't, and without a PoP presence the dedicated link has to come through a provider.
 
 </details>
 
@@ -574,3 +578,265 @@ Do not run anything yourself.
 
 <PASTE COMMANDS>
 ```
+
+---
+
+<a id="part-8"></a>
+## PART 8 — Grill log: questions, slips and the reasoning behind them
+
+Four grill rounds on 2026-10-17. Part 8.1 explains the basis behind each slip, not just the fact; 8.2 answers the questions you asked; 8.3 lists every grill question with its answer, one dropdown each, so you can re-quiz yourself.
+
+<a id="part-8-1"></a>
+### 8.1 Deep dives on the slips
+
+#### 1. Why a new VPC blocks SSH: ingress, egress and default deny
+
+**The basis:** a firewall that starts open has to be closed rule by rule, and one forgotten rule is a hole. A firewall that starts closed fails safe: forget a rule and something doesn't work, but nothing is exposed. So every VPC starts with two **implied rules** at the lowest priority (65535):
+
+| Implied rule | Direction | Effect |
+| :--- | :--- | :--- |
+| Deny all | Ingress (into a VM) | Nothing can connect in until you allow it |
+| Allow all | Egress (out of a VM) | The VM can start connections out |
+
+**Direction is always from the VM's point of view.** SSH to a VM is *ingress*, so it is blocked until you write a rule. Only the `default` network ships with `default-allow-ssh`; a VPC you create has nothing, which is why Lab 2 has you tick the rules.
+
+**A ping crosses the firewall twice**, once at each VM:
+
+```mermaid
+%%{init: {'theme':'base'}}%%
+flowchart LR
+    A["mynet-us-vm<br/>sends ping"] -->|"1. EGRESS from us-vm<br/>implied allow-all-egress: OK"| B["mynet-r2-vm<br/>receives ping"]
+    B -->|"2. INGRESS into r2-vm<br/>needs an allow rule"| C{"Which rule matches<br/>the packet's SOURCE address?"}
+    C -->|"source 10.x (internal IP)"| D["allow-custom<br/>10.128.0.0/9, all protocols"]
+    C -->|"source = external IP"| E["allow-icmp<br/>0.0.0.0/0, icmp"]
+    style A fill:#1a1a2e,stroke:#e94560,color:#ffffff
+    style B fill:#2d3436,stroke:#00b894,color:#ffffff
+    style C fill:#16213e,stroke:#0f3460,color:#ffffff
+    style D fill:#0f3460,stroke:#533483,color:#ffffff
+    style E fill:#0f3460,stroke:#533483,color:#ffffff
+```
+
+**Why the reply comes back without a rule:** rules are **stateful**. Once the firewall allows a connection in, it remembers it and lets the replies out. You only ever write a rule for the direction that *starts* the conversation.
+
+> **Key Idea:** to debug "I can't reach my VM", ask first which direction starts the conversation, then find the rule that allows that direction from that source on that protocol.
+
+#### 2. Why a VM's external IP changes on stop but not on reboot
+
+**The basis:** a VM's network card only ever knows its **internal IP**. The external IP is not configured on the VM; Google maps it from a pool of public addresses onto the internal one, like a front-desk number forwarding to an extension. Public IPv4 addresses are scarce and billable, so an **ephemeral** one is lent only while the VM is running.
+
+| Event | Internal IP | Ephemeral external IP | Static external IP |
+| :--- | :--- | :--- | :--- |
+| Reboot / reset | Same | Same (the VM never stopped) | Same |
+| **Stop**, then start | Same | **Released**; a new one on start | Same |
+| Delete the VM | Released | Released | Kept until you release it |
+
+You mentioned "every reboot": the dividing line is **stop**, not reboot.
+
+#### 3. Why a subnet can grow but never shrink
+
+**The basis:** every VM in a subnet already holds an address from its range. Think of the range as a numbered row of parking spaces with cars parked in them.
+- **Expanding** (`/20` to `/16`) only adds spaces. Every car stays valid, so nothing has to move.
+- **Shrinking** (`/20` to `/24`) removes spaces. A VM could be sitting in one of them, so Google can't allow it.
+
+Two follow-ups: you still can't expand into a range another subnet or a peered network already uses, because ranges can't overlap; and this is why you plan a custom mode range large enough at the start.
+
+#### 4. Which load balancer: read the layer
+
+**The basis:** a load balancer can only make decisions about what it can *see* in the packet.
+- **Layer 7 (Application LB)** reads inside HTTP: URL path, host, headers, cookies. So it can route `/images` to one backend and `/api` to another, end TLS, and plug in Cloud CDN.
+- **Layer 4 (Network LB)** sees only IP address, port and protocol. It can balance any TCP or UDP traffic but knows nothing about URLs.
+- **Proxy vs passthrough** (layer 4 only): a proxy ends the client's connection and opens a new one to the backend, so the backend sees the proxy's address. Passthrough forwards the original packets, so the backend **sees the real client IP**, and it can carry UDP and other protocols.
+
+```mermaid
+%%{init: {'theme':'base'}}%%
+flowchart TD
+    Q{"Is the traffic<br/>HTTP or HTTPS?"} -->|"yes: URLs, TLS, paths, CDN"| A["Application LB (layer 7)"]
+    Q -->|"no"| R{"Need the client's real IP,<br/>or UDP / other protocols?"}
+    R -->|"yes"| P["Passthrough Network LB"]
+    R -->|"no, plain TCP"| X["Proxy Network LB"]
+    style Q fill:#1a1a2e,stroke:#e94560,color:#ffffff
+    style R fill:#16213e,stroke:#0f3460,color:#ffffff
+    style A fill:#2d3436,stroke:#00b894,color:#ffffff
+    style P fill:#2d3436,stroke:#00b894,color:#ffffff
+    style X fill:#2d3436,stroke:#00b894,color:#ffffff
+```
+
+The question you slipped on said "HTTP" and "TLS ended at the load balancer": both are layer 7 clues, so Application LB.
+
+#### 5. Shared VPC vs VPC Network Peering: who owns the network?
+
+**The basis:** the difference is *how many networks exist* and *who administers them*.
+
+```mermaid
+%%{init: {'theme':'base'}}%%
+flowchart LR
+    subgraph SV["Shared VPC: ONE network, many projects"]
+        H["Host project<br/>owns the VPC and its subnets"] --> S1["Service project A<br/>VMs use a subnet IAM granted"]
+        H --> S2["Service project B<br/>VMs use a subnet IAM granted"]
+    end
+    subgraph PE["Peering: TWO networks, joined"]
+        N1["VPC 1<br/>its own admins"] <-->|"peering configured on BOTH sides"| N2["VPC 2<br/>its own admins"]
+    end
+    style H fill:#1a1a2e,stroke:#e94560,color:#ffffff
+    style S1 fill:#2d3436,stroke:#00b894,color:#ffffff
+    style S2 fill:#2d3436,stroke:#00b894,color:#ffffff
+    style N1 fill:#16213e,stroke:#0f3460,color:#ffffff
+    style N2 fill:#16213e,stroke:#0f3460,color:#ffffff
+    style SV fill:#0f3460,stroke:#533483,color:#ffffff
+    style PE fill:#0f3460,stroke:#533483,color:#ffffff
+```
+
+| | Shared VPC | VPC Network Peering |
+| :--- | :--- | :--- |
+| **Analogy** | Teams from several departments working on one office floor the facilities team manages | Two separate buildings with a bridge between them |
+| **Networks** | One, owned by the host project | Two, each owned by its own project |
+| **Who decides access** | **IAM** on the subnets | Each side's own admins, who must both set up the peering |
+| **Organization** | Same organization | Can cross organizations |
+| **Overlapping ranges** | Not an issue: it is one network | Not allowed |
+| **Transitive?** | n/a | **No**: A–B and B–C does not give A–C |
+
+Clue words: "**share** one VPC", "IAM controls who uses which subnet", "central network team" mean Shared VPC. "Two **independently managed** networks need to talk" means peering.
+
+#### 6. Why Cloud VPN is not the answer to "high bandwidth" (Q12)
+
+**The basis:** Cloud VPN encrypts traffic and sends it **over the public internet**. Privacy comes from encryption, but speed and reliability still depend on the internet path, and each tunnel is capped at a few Gbps. Interconnect uses a **dedicated physical circuit** that never touches the public internet, so you get predictable bandwidth and latency, and an SLA of up to 99.99%.
+
+| Your situation | Pick |
+| :--- | :--- |
+| Private addresses on both sides, current internet link is fine | **Cloud VPN** |
+| Private, internet link not good enough, you can put equipment in a Google PoP | **Dedicated Interconnect** |
+| Private, internet link not good enough, you can't | **Partner Interconnect** |
+| Public IPs are fine, link is poor | Direct or Carrier Peering (no SLA) |
+
+#### 7. Why two auto mode VPCs can't peer, even in different regions (Q10)
+
+**The basis:** peering merges two networks' routing tables into one view, so every address must mean one thing. Every auto mode VPC puts a `/20` subnet in **every** region, all from `10.128.0.0/9`, so the ranges are identical in every auto mode network. Using different regions for your VMs changes nothing, since the subnets exist in all regions anyway. Custom mode VPCs peer fine as long as their chosen ranges don't overlap. The VPC itself is global, so the regions of the VMs never matter.
+
+<a id="part-8-2"></a>
+### 8.2 Questions you asked
+
+#### What is an SLA?
+
+A **Service Level Agreement** is Google's written promise of how much of the time a service will be up. If Google misses it, you get service credits, not a guarantee that nothing breaks.
+
+| SLA | Allowed downtime per year |
+| :--- | :--- |
+| 99.9% | about 8.8 hours |
+| 99.99% | about 52 minutes |
+
+In M3: Cloud VPN (HA VPN), Dedicated Interconnect and Partner Interconnect have SLAs (up to 99.99% with Google's recommended topology). **Direct Peering and Carrier Peering have none.** Question says "SLA" or "highest uptime": never peering.
+
+#### Why Q14's internal ping survives deleting `allow-icmp`
+
+Each ping is judged by its **source address**. The internal ping's source (`10.x`) is inside `10.128.0.0/9`, so `allow-custom` (all protocols from that block) lets it in. The external ping's source is outside that block, so only `allow-icmp` (from `0.0.0.0/0`) allowed it. See the diagram in 8.1 section 1.
+
+<a id="part-8-3"></a>
+### 8.3 The questions, round by round
+
+#### Round 1
+
+<details>
+<summary><strong>R1-Q1.</strong> Is a VPC global, regional or zonal? And a subnet?</summary>
+
+✅ VPC global, subnet regional.
+
+</details>
+
+<details>
+<summary><strong>R1-Q2.</strong> Two VMs in different regions are on the same VPC. Can they ping each other's internal IPs, and do you need a VPN?</summary>
+
+✅ Yes, over internal IPs, and no VPN: one global VPC on Google's network.
+
+</details>
+
+<details>
+<summary><strong>R1-Q3.</strong> A new VPC has no firewall rules of yours. Can you SSH to a VM in it?</summary>
+
+❌ You answered yes. **No.** Implied deny-all-ingress blocks it until you add a rule allowing `tcp:22`. See 8.1 section 1.
+
+</details>
+
+<details>
+<summary><strong>R1-Q4.</strong> You stop a VM and start it again. What happens to its internal IP and its ephemeral external IP?</summary>
+
+✅ with a fix. Internal stays; the ephemeral external is released on **stop**, not on reboot; static stays. See 8.1 section 2.
+
+</details>
+
+#### Round 2
+
+<details>
+<summary><strong>R2-Q1.</strong> Which firewall rule allows the external ping to `mynet-r2-vm`, and what source range?</summary>
+
+Partly. Egress from `mynet-us-vm` is the implied allow-all-egress; the arrival at `mynet-r2-vm` is ingress and needs **`mynetwork-allow-icmp`**, ICMP from **`0.0.0.0/0`**.
+
+</details>
+
+<details>
+<summary><strong>R2-Q2.</strong> After deleting `allow-icmp`, the internal ping still works. Which rule allows it and why does it cover ICMP?</summary>
+
+Partly. **`mynetwork-allow-custom`**, source **`10.128.0.0/9`** (the whole auto mode block, not one subnet), protocol **all**, so ICMP is included.
+
+</details>
+
+<details>
+<summary><strong>R2-Q3.</strong> Priority 1000 allows, priority 100 denies, same traffic. Which wins?</summary>
+
+✅ 100: the lower number is checked first, so the deny applies.
+
+</details>
+
+<details>
+<summary><strong>R2-Q4 (multiple choice).</strong> "Highest uptime, SLA required, private connection to Google": Cloud VPN, Direct Peering, Carrier Peering or Dedicated Interconnect?</summary>
+
+✅ Dedicated Interconnect. Direct and Carrier Peering have no SLA.
+
+</details>
+
+#### Round 3
+
+<details>
+<summary><strong>R3-Q1.</strong> Subnet `10.0.0.0/20` exists. Can you shrink it to `/24`, or expand it to `/16`?</summary>
+
+❌ You had it backwards. You can **expand**, never **shrink**. See 8.1 section 3.
+
+</details>
+
+<details>
+<summary><strong>R3-Q2.</strong> A rule allows `tcp:80` to VMs tagged `web`. A new VM has no tag. Can people reach port 80?</summary>
+
+✅ No. The rule doesn't match the VM, so the implied deny-all-ingress applies.
+
+</details>
+
+#### Round 4 (multiple choice)
+
+<details>
+<summary><strong>R4-Q1.</strong> A restartable overnight batch job: cheapest VM option? A. Committed use  B. Spot  C. Sustained use  D. Custom machine type</summary>
+
+✅ B, Spot VM (up to about 90% off, can be stopped any time).
+
+</details>
+
+<details>
+<summary><strong>R4-Q2.</strong> HTTP traffic balanced across VMs in two regions behind one IP, TLS ended at the load balancer? A. Passthrough Network LB  B. Proxy Network LB  C. Application LB  D. Cloud DNS</summary>
+
+❌ You guessed B. **C, Application LB**: HTTP and TLS termination are layer 7. See 8.1 section 4.
+
+</details>
+
+<details>
+<summary><strong>R4-Q3.</strong> A VM runs all month, no commitment. Which discount, from what point?</summary>
+
+✅ B, sustained use discount after 25% of the month.
+
+</details>
+
+<details>
+<summary><strong>R4-Q4.</strong> Two projects in one organization share one VPC with IAM deciding who uses which subnet? A. Peering  B. Cloud VPN  C. Shared VPC  D. Direct Peering</summary>
+
+❌ You guessed A. **C, Shared VPC**. See 8.1 section 5.
+
+</details>
+
+**Score:** Round 1: 3 of 4 · Round 2: 2 right, 2 partial · Round 3: 1 of 2 · Round 4: 2 of 4. **Weak spots to revisit:** firewall ingress vs egress, load balancer choice, Shared VPC vs peering.

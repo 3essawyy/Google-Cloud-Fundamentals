@@ -12,6 +12,14 @@ All 4 labs are due **Wednesday 2026-10-21 at 23:59 Cairo time**. The plan is one
 - Use the Gemini CLI agent as the checker: paste a command block and the prompt at the end of the lab checklists, and it fixes placeholders before you run them in Cloud Shell.
 - Click **Check my progress** after each task, and **End Lab** only once every check is green.
 
+## What counts as passing Phase 1
+
+The course material in this repo does not state formal pass criteria for the four labs. What the roadmap works to:
+
+- Each lab is done when **every "Check my progress" is green (score 100%)**, then you click **End Lab**.
+- All 4 labs must be at 100% by **Wed 2026-10-21 23:59 Cairo time**; Wednesday is for redoing any lab below 100%.
+- Not stated anywhere here, so confirm on the Skills Boost course page: whether a badge or course completion is awarded, and how the deadline is enforced.
+
 ## Day-by-day sprint (Sat 17 to Wed 21 Oct)
 
 One lab a day after its theory, about 2.5 hours each evening; Wednesday is only for catching up.

@@ -2,7 +2,7 @@
 
 ### Containers, Kubernetes, GKE, Cloud Run and Cloud Run functions, condensed for Lab 4 and the ACE exam
 
-> **As of:** 2026-10-19 · **Sources:** the M5 and M6 `_v2.md` study guides in [modules/](../modules/M5_Containers_in_the_Cloud/M5_Containers_in_the_Cloud_v2.md) and the [Lab 4 manual](../labs/04_Hello_Cloud_Run.md) · **Synced with:** the Claude Doc of the same name (link added to the roadmap once published)
+> **As of:** 2026-10-19 · **Sources:** the M5 and M6 `_v2.md` study guides in [modules/](../modules/M5_Containers_in_the_Cloud/M5_Containers_in_the_Cloud_v2.md) and the [Lab 4 manual](../labs/04_Hello_Cloud_Run.md) · **Synced with:** the Claude Doc of the same name, https://claude.ai/code/artifact/f9804b10-fbcc-4abc-8797-2115c413fda1
 
 ---
 

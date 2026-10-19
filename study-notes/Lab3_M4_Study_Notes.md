@@ -31,8 +31,13 @@
   - [7.1 What each step teaches](#part-7-1)
   - [7.2 Checklist](#part-7-2)
   - [7.3 Expected results and fixes](#part-7-3)
-  - [7.4 Commands for the Gemini CLI agent](#part-7-4)
+  - [7.4 The commands, explained, and the Console route](#part-7-4)
   - [7.5 Cloud Shell, Git Bash and the bloghost SSH window](#part-7-5)
+- [PART 8 — Grill log: slips and the reasoning behind them](#part-8)
+  - [8.1 Deep dives on the slips](#part-8-1)
+  - [8.2 Picking a class when you read the data](#part-8-2)
+  - [8.3 Grill round 1: pick the letter](#part-8-3)
+  - [8.4 Grill round 2: pick the letter](#part-8-4)
 
 ---
 
@@ -509,9 +514,13 @@ About 45 minutes plus the wait for Cloud SQL, all in the Console except Task 3 (
 > Start Cloud SQL (Task 4) as soon as you have `bloghost`'s external IP: it's the slowest step, and you can do Task 3 in Cloud Shell while it creates.
 
 <a id="part-7-4"></a>
-### 7.4 Commands for the Gemini CLI agent
+### 7.4 The commands, explained, and the Console route
 
-Task 3, in Cloud Shell (pick `US`, `EU` or `ASIA`, whichever is nearest the lab region):
+**Method:** do everything in the **Console** wherever the lab lets you. Only Task 3 asks for commands, because the banner image sits in a Google bucket you copy from, and a command is the easiest way to do that copy. Here is each one, piece by piece.
+
+**Reading any `gcloud` command.** They all follow the same pattern: `gcloud` (the tool), then a *what* (a group such as `storage` or `sql`), then a *noun* (`buckets`, `instances`), then a *verb* (`create`, `list`, `describe`), then the *target* and any `--flags` that change how it behaves. So `gcloud storage buckets create` reads as "tool, storage, buckets, create".
+
+**Task 3, line by line** (pick `US`, `EU` or `ASIA`, whichever is nearest the lab region):
 
 ```bash
 export LOCATION=US
@@ -521,23 +530,39 @@ gcloud storage cp my-excellent-blog.png gs://$DEVSHELL_PROJECT_ID/my-excellent-b
 gsutil acl ch -u allUsers:R gs://$DEVSHELL_PROJECT_ID/my-excellent-blog.png
 ```
 
-Optional checks in Cloud Shell; the lab grades the Console steps:
+| Piece | What it means | Console equivalent |
+| :--- | :--- | :--- |
+| `export LOCATION=US` | Saves the word `US` in a variable called `LOCATION`, so you can write `$LOCATION` below instead of retyping it. `export` makes the variable available to the commands that follow | Nothing: the Console asks you in a dropdown |
+| `gcloud storage buckets create` | Create a bucket | Cloud Storage > Buckets > **Create** |
+| `-l $LOCATION` | `-l` is short for "location". The bucket goes in `US` | The Location type "Multi-region" and the choice `US` |
+| `gs://` | The prefix that means "this is a Cloud Storage path", like `https://` for web pages | Not needed |
+| `$DEVSHELL_PROJECT_ID` | A variable Cloud Shell already filled in with your project ID. The bucket gets that name because bucket names must be globally unique | You type the project ID as the name |
+| `gcloud storage cp SOURCE DESTINATION` | **C**o**p**y. The first argument is where from, the second is where to | Upload / Download buttons |
+| `gs://cloud-training/gcpfci/my-excellent-blog.png` | The image in Google's public training bucket (the source) | Not possible from the Console without downloading to your computer first |
+| `my-excellent-blog.png` (as destination) | A file in the current folder of Cloud Shell | Not applicable |
+| `gsutil acl ch -u allUsers:R ...` | `gsutil` is the older storage tool. `acl` means work with access control lists, `ch` means change. `-u` adds an entry for a user or group, and `allUsers:R` means "everyone, with Read permission". The last part is the object it applies to | Bucket > the object's `⋮` menu > **Edit access** > Add entry > `allUsers` > Reader. Only visible when the bucket is fine-grained |
 
-```bash
-gcloud compute instances list
-gcloud storage ls -L gs://$DEVSHELL_PROJECT_ID/my-excellent-blog.png
-gcloud sql instances list
-gcloud sql instances describe blog-db --format="value(ipAddresses[0].ipAddress, settings.ipConfiguration.authorizedNetworks)"
-gcloud sql users list --instance=blog-db
-curl -s http://BLOGHOST_EXTERNAL_IP/index.php
-```
+> **Remember:** `gsutil` is the older tool and `gcloud storage` is its replacement. The lab still uses `gsutil` for the ACL line, and that is fine.
 
-On `bloghost` (SSH window), if the page doesn't load:
+**Console route for Task 3 if you wanted it:** Cloud Storage > Buckets > Create > name = your project ID > Location type Multi-region, `US` > keep the defaults, but under "Choose how to control access to objects" pick **Fine-grained** if the Console offers it, since the ACL step needs it > Create > Upload files. The only snag is that the image is not on your computer, which is why the lab uses a command to copy it from Google's bucket.
 
-```bash
-sudo systemctl status apache2 --no-pager
-sudo journalctl -u google-startup-scripts --no-pager | tail -20
-```
+**The optional checks, explained.** Only run these if something looks wrong:
+
+| Command | What it does |
+| :--- | :--- |
+| `gcloud compute instances list` | Lists the VMs in the project and shows their IPs. Console: Compute Engine > VM instances |
+| `gcloud storage ls -L gs://$DEVSHELL_PROJECT_ID/my-excellent-blog.png` | `ls` lists, `-L` means long format with all details of the object, including its size and class. Console: click the object in the bucket |
+| `gcloud sql instances list` | Lists Cloud SQL instances and their status. Console: SQL page |
+| `gcloud sql instances describe blog-db --format="value(...)"` | Shows the details of `blog-db`. `--format` picks just the fields we want, here the IP and the authorized networks. Console: the instance's Overview and Connections pages |
+| `gcloud sql users list --instance=blog-db` | Lists the database users, so you can check `blogdbuser` exists. Console: instance > Users |
+| `curl -s http://BLOGHOST_EXTERNAL_IP/index.php` | `curl` fetches a web page and prints it as text, like a browser without the graphics. `-s` means silent: no progress bar. Your browser does this job better |
+
+On `bloghost`, if the page doesn't load:
+
+| Command | What it does |
+| :--- | :--- |
+| `sudo systemctl status apache2 --no-pager` | `sudo` runs it as administrator, `systemctl status` asks Linux if a service is running, and `apache2` is the web server. `--no-pager` stops the output waiting for a keypress |
+| `sudo journalctl -u google-startup-scripts --no-pager \| tail -20` | `journalctl` reads the system log, `-u` picks one service (the one that ran your startup script). `\| tail -20` passes the output to `tail`, which keeps only the last 20 lines. Console: VM instance > Logs |
 
 Prompt to paste into the Gemini CLI agent before running anything:
 
@@ -589,3 +614,312 @@ If `sudo service apache2 restart` says the service doesn't exist, you're in Clou
 2. `gcloud storage cp my-excellent-blog.png gs://$DEVSHELL_PROJECT_ID/my-excellent-blog.png` reads that local file and uploads it into your bucket.
 
 Copying bucket to bucket directly would also work. The lab goes through Cloud Shell to show both a download and an upload.
+
+---
+
+<a id="part-8"></a>
+## PART 8 — Grill log: slips and the reasoning behind them
+
+You flagged Q5, Q6, Q8, Q9, Q10 and Q13 as shaky on 2026-10-19. Each deep dive below starts from the reason things work that way, not from the fact, and ends with where you'd click in the Console. The grill rounds and every question with its answer are added to this part as you answer them.
+
+<a id="part-8-1"></a>
+### 8.1 Deep dives on the slips
+
+#### 1. Why an early delete is still charged (Q5)
+
+The colder classes make a **deal**: Google gives you a lower price per GB each month, and in return you promise to leave the data there for a minimum time.
+
+| Class | Monthly price per GB | The promise you make |
+| :--- | :--- | :--- |
+| Standard | Highest | None |
+| Nearline | Lower | 30 days |
+| Coldline | Lower still | 90 days |
+| Archive | Lowest | 365 days |
+
+Why Google asks for it: the cheap price only works out for Google if the data stays put for a long time. If you could put a file in Archive for a day and delete it, you'd get the cheap rate without the commitment.
+
+So deleting early doesn't cancel the deal, it just **ends it early and bills the remaining days**. An object in Archive deleted at day 60 is charged as though it lived to day 365. That is what "minimum storage duration" means.
+
+**Worked example (Q5):** backups are kept 60 days. Archive would charge you for 365 days of storage on each, which is the wrong choice. Nearline's promise is 30 days, which fits inside the 60, so Nearline is the cheapest option that doesn't waste a commitment.
+
+**The rule of thumb:** pick the class whose minimum is **no longer than** how long you really keep the data.
+
+**Console:** Cloud Storage > Buckets > your bucket > **Configuration** shows the default class. Each object also has its own class in the object list.
+
+#### 2. Lifecycle rule vs Autoclass: who decides? (Q6)
+
+Both move data between classes so you don't pay Standard prices for old data. The difference is **who makes the decision**.
+
+| | Lifecycle rule | Autoclass |
+| :--- | :--- | :--- |
+| Who decides | **You**, with a rule | **Google**, by watching each object |
+| Based on | Age, creation date, number of newer versions | Whether the object was read |
+| Use it when | You **know** the pattern: "logs are never read after 90 days" | You **can't predict** the pattern: some files stay hot, some go cold |
+
+Q6 says "move to Coldline after 90 days and delete after a year", which are **fixed times you already know**. That is a lifecycle rule with two actions:
+
+1. Condition: age 90 days → action: **Set storage class** to Coldline.
+2. Condition: age 365 days → action: **Delete**.
+
+The only two actions a lifecycle rule has are **Set storage class** and **Delete**.
+
+**Console:** Cloud Storage > Buckets > your bucket > **Lifecycle** tab > **Add a rule** > choose the action > set the condition (Age) > Create. Autoclass is a setting on the bucket's **Configuration** tab.
+
+#### 3. Why the lab's ACL command works, and when it wouldn't (Q8)
+
+A bucket can be in one of two **access modes**, chosen when it's created:
+
+- **Fine-grained:** both IAM and ACLs work.
+- **Uniform:** ACLs are switched off. Only IAM counts.
+
+The lab creates the bucket with `gcloud storage buckets create` and no extra options, so it stays **fine-grained**. That means the ACL command, which adds one entry saying `allUsers` can read this single image, is accepted.
+
+When it would fail:
+
+1. **Uniform bucket-level access is on.** The bucket refuses ACL changes entirely, with an error that mentions uniform access.
+2. **Public access prevention is on.** It blocks `allUsers` whatever way you grant it.
+
+**Console:** open the bucket > **Permissions** tab. It shows the access mode (Fine-grained or Uniform) and a Public access prevention setting. In a fine-grained bucket, the object's `⋮` menu > **Edit access** is the ACL screen.
+
+See [ACL vs IAM in detail](#part-1-4) for how the two combine.
+
+#### 4. "Anyone who gets that URL will leak it": signed URLs (Q9)
+
+You're right, and that is exactly the trade-off. A **signed URL** works like a **hotel key card for one door**: it carries the permission inside the link itself. The server doesn't ask who you are, only whether the signature on the link is valid and not expired. So:
+
+- **Anyone who holds the link can use it** until it expires, including someone you didn't send it to.
+- You **can't take it back** by removing a person, because it isn't tied to a person.
+
+Compare the alternatives:
+
+| Option | Tied to a person? | If the link leaks | Needs a Google account? |
+| :--- | :--- | :--- | :--- |
+| **Make the object public** (`allUsers`) | No | Everyone already has it | No |
+| **Signed URL** | No: tied to a link and an expiry | Whoever has the link, until it expires | **No** |
+| **IAM role** for the person | **Yes** | Useless to others: they'd have to sign in as that person | **Yes** |
+
+Q9's contractor **has no Google account**, so IAM isn't possible, and public access is too wide for one file. A signed URL is the only option that is both private and works without an account.
+
+How to limit the risk: make the expiry as short as the job needs (2 hours in Q9), send the link over a private channel, and sign for one object only. The link is limited to what the signer is allowed to read.
+
+**Console note:** the Console can show an **Authenticated URL** for an object, but it only works for someone signed in to a Google account that has IAM access. Creating a true signed URL needs a command or a client library, so for the exam you only need to recognise the idea: *time-limited link, no account needed, anyone with the link can use it*.
+
+#### 5. Why Cloud SQL needs the VM's external IP (Q10)
+
+Cloud SQL's firewall works like a guest list at the door: it checks **the address the connection came from** and lets in only the addresses on its list. So the question is what address it sees.
+
+1. `bloghost` has two addresses: an **internal** one (`10.x.x.x`, private to your VPC) and an **external** one (public).
+2. Cloud SQL, as set up in the lab, has a **public IP**. To reach a public address, `bloghost`'s traffic leaves your VPC to the internet.
+3. On the way out, Google swaps the internal source address for the VM's **external** one. This is called NAT (network address translation). The internal address never leaves your VPC.
+4. Cloud SQL receives the connection with source = `bloghost`'s external IP.
+
+So the list must contain the **external** IP. Adding the internal one would allow nothing, because Cloud SQL never sees it. The `/32` means "exactly this one address".
+
+It's the same idea as Lab 2, where the external ping arrived from the sender's external address and not from its `10.x` one.
+
+Private IP would remove all of this: both sides sit inside the VPC and see each other's internal addresses, with no public exposure.
+
+**Why not just use the internal address?** You can, and in production you should: that is Cloud SQL's **private IP**. It isn't the lab default because Cloud SQL does not live inside your VPC. Google runs it in its own managed network, so the VM's `10.x` address can't reach it until you set up **Private Services Access**, a one-time connection (a VPC peering) between your VPC and Google's network with a reserved address range. The lab skips that and uses the public IP plus one allowed address. Exam shorthand: "most secure way for a VM to reach Cloud SQL" means private IP.
+
+**Console:** SQL > `blog-db` > **Connections** > **Networking** tab > **Authorized networks** > Add a network.
+
+#### 6. Online transfer vs Transfer Appliance: do the maths (Q13)
+
+The deciding question is simple: **how long would the upload take?** Run the numbers for Q13, 2 PB over a typical 1 Gbps link, used at full speed:
+
+- 2 PB = 2 × 10¹⁵ bytes = 1.6 × 10¹⁶ bits.
+- At 1 Gbps (10⁹ bits a second), that is 1.6 × 10⁷ seconds.
+- 1.6 × 10⁷ seconds ÷ 86,400 seconds in a day ≈ **185 days**, about six months, with the link doing nothing else.
+
+That is why the question mentions "months". At that size the fastest route is a **courier**.
+
+| Tool | How it moves data | Pick it when |
+| :--- | :--- | :--- |
+| **Upload in the Console, or `gcloud storage cp`** | Over the internet from your machine | Small to medium amounts: a few GB to a few TB |
+| **Storage Transfer Service** | Google pulls the data **online** from another cloud, another bucket or a web address, on a schedule | Large amounts that **can** travel over a good link, and the source is reachable online |
+| **Transfer Appliance** | Google ships you a storage server (up to about 1 PB each). You fill it and ship it back, and Google loads it into your bucket | The transfer would take **weeks or months** online, or your link is slow or unreliable |
+
+The rule of thumb: if the online transfer would take longer than about a week, ask whether a shipped appliance is quicker.
+
+**Console:** Storage Transfer Service is in the Console under Data Transfer. Transfer Appliance is ordered through the Console's Transfer Appliance page.
+
+
+<a id="part-8-2"></a>
+### 8.2 Picking a class when you read the data
+
+Q1 of the grill showed the trap: the cheapest class is not just about **storage price**. Each class has two prices, and reads decide which wins.
+
+| Class | Storage per GB per month | Read fee per GB | Minimum days billed |
+| :--- | :--- | :--- | :--- |
+| Standard | about $0.020 | $0 | none |
+| Nearline | about $0.010 | about $0.01 | 30 |
+| Coldline | about $0.004 | about $0.02 | 90 |
+| Archive | about $0.0012 | about $0.05 | 365 |
+
+These are rough list prices to show the shape, check the pricing page for real ones.
+
+**Example A: logs kept exactly 20 days, never read.** Nearline bills its 30-day minimum, about $0.010 per GB. Standard for 20 days costs about $0.013. Coldline bills 90 days, about $0.012. **Nearline** wins. If you read them often, Standard wins because it has no read fee.
+
+**Example B: 100 GB read in full every 40 days, kept 4 months (3 reads).**
+
+| Class | Storage | Reads | Total |
+| :--- | :--- | :--- | :--- |
+| Standard | $8.00 | $0 | $8.00 |
+| Nearline | $4.00 | 3 × 100 × $0.01 = $3.00 | **$7.00** |
+| Coldline | $1.60 | 3 × 100 × $0.02 = $6.00 | $7.60 |
+
+**Nearline** wins, narrowly. Coldline saves about $0.006 per GB each month but costs $0.01 more per GB read, so it only wins if you read less often than about **every 50 days**. Reading once a quarter favours Coldline.
+
+**How the minimum works (the "floor"):**
+
+- **Reading never resets the clock and never triggers the minimum.** You pay the read fee each time and nothing else.
+- The minimum only bites if you **delete, overwrite or move the object to another class before the minimum days are up**. You are then charged storage for the remaining days (Coldline deleted on day 40 is billed for 50 more days).
+- Once past the minimum, billing is just per day kept.
+
+**Quick guide by how often you read:**
+
+| Read about | Class | Example |
+| :--- | :--- | :--- |
+| Every day or week | Standard | Website images, app uploads |
+| About monthly | Nearline | Last month's logs, monthly backups |
+| About quarterly | Coldline | Quarterly reports, disaster-recovery copies |
+| About yearly or less, kept for years | Archive | Compliance records, old tax or medical files |
+| No idea | Autoclass | Mixed files nobody can predict |
+
+**Console:** Cloud Storage > Create a bucket > **Choose a storage class**, or tick **Autoclass** to let Google decide.
+
+<a id="part-8-3"></a>
+### 8.3 Grill round 1: pick the letter
+
+You answered 1 to 6 on 2026-10-19 and got 5 of 6. Answers are in the dropdowns.
+
+**Q1.** Logs kept exactly 20 days, cheapest class? A. Standard B. Nearline C. Coldline D. Archive
+
+<details>
+<summary>Answer to Q1</summary>
+
+**B, Nearline.** You answered Standard. Standard has no minimum, which looks safe, but Nearline's 30-day minimum costs about $0.010 per GB against about $0.013 for 20 days of Standard. Coldline and Archive bill 90 and 365 days. See [8.2](#part-8-2).
+
+</details>
+
+**Q2.** Nobody knows which logs will still be read. What fits best? A. A lifecycle rule moving everything to Coldline after 30 days B. Autoclass C. Keep everything in Archive D. Delete after 30 days
+
+<details>
+<summary>Answer to Q2</summary>
+
+**B, Autoclass** (you got it). A lifecycle rule needs you to know the pattern in advance, and Autoclass watches each object and moves it for you.
+
+</details>
+
+**Q3.** `gsutil acl ch` fails with an error mentioning "uniform access". What is going on? A. Wrong bucket name B. The bucket uses uniform bucket-level access, so ACLs are off and you grant access with IAM C. Cloud Shell lacks permission D. The object is too large
+
+<details>
+<summary>Answer to Q3</summary>
+
+**B** (you got it). Uniform access switches ACLs off, so only IAM counts. See [8.1 item 3](#part-8-1).
+
+</details>
+
+**Q4.** A signed URL was emailed to the wrong person. What can they do? A. Nothing B. Use it until it expires, because the link is the key C. Use it only with a Google account D. Use it once
+
+<details>
+<summary>Answer to Q4</summary>
+
+**B** (you got it). A signed URL is not tied to a person, so anyone holding it can use it until the expiry.
+
+</details>
+
+**Q5.** A VM (`10.2.0.7`, external `34.1.2.3`) connects to a Cloud SQL public IP. Which address does Cloud SQL see and which goes in the authorized network? A. `10.2.0.7` B. `34.1.2.3` C. Either D. The Cloud SQL instance's own IP
+
+<details>
+<summary>Answer to Q5</summary>
+
+**B** (you got it). Traffic leaving for a public address is NAT-ed to the VM's external IP, so `34.1.2.3/32` goes on the list. You asked why not the internal address: that is private IP, which needs Private Services Access set up. See [8.1 item 5](#part-8-1).
+
+</details>
+
+**Q6.** Move 500 TB from another cloud's bucket into Cloud Storage over a fast link? A. Transfer Appliance B. Storage Transfer Service C. Dragging files in the Console D. Cloud Shell `cp`
+
+<details>
+<summary>Answer to Q6</summary>
+
+**B, Storage Transfer Service** (you got it). The source is online and the link is fast, so Google pulls the data directly. An appliance is for slow links or months-long uploads.
+
+</details>
+
+<a id="part-8-4"></a>
+### 8.4 Grill round 2: pick the letter
+
+You answered 7 to 14 on 2026-10-19 and got 5 of 8. The three slips (11, 12, 13) all came from picking the lab's shortcut or the obvious tool over what the situation needs.
+
+**Q7.** A dev emails you a link to a private file and it must stop working in 1 hour. What do you use? A. Make the object public B. Signed URL with a 1 hour expiry C. An ACL for `allUsers` D. Move it to Archive
+
+<details>
+<summary>Answer to Q7</summary>
+
+**B** (you got it). A signed URL carries its own permission and expires, so it is private and time-limited without needing an account.
+
+</details>
+
+**Q8.** Which class suits data read about once a year and kept for ten years? A. Standard B. Nearline C. Coldline D. Archive
+
+<details>
+<summary>Answer to Q8</summary>
+
+**D, Archive** (you got it). Rarely read and kept long, so the 365-day minimum costs you nothing and the storage price is lowest.
+
+</details>
+
+**Q9.** Versioning is on. You upload a file, then overwrite it 3 times. What does the bucket hold? A. Only the latest B. The latest plus 3 older versions C. Nothing, versioning needs Autoclass D. 3 copies in 3 regions
+
+<details>
+<summary>Answer to Q9</summary>
+
+**B** (you got it). 1 live version plus 3 noncurrent versions, 4 in total.
+
+</details>
+
+**Q10.** Data is kept exactly 90 days and read in full once, at the end. Cheapest class using the 8.2 prices? A. Standard B. Nearline C. Coldline D. Archive
+
+<details>
+<summary>Answer to Q10</summary>
+
+**C, Coldline** (you got it). Per GB: Standard about $0.060, Nearline $0.030 storage + $0.01 read = $0.040, Coldline $0.012 + $0.02 = $0.032, Archive $0.0144 (365 days billed) + $0.05 = $0.064.
+
+</details>
+
+**Q11.** Most secure way for the `bloghost` VM to reach Cloud SQL in production? A. Public IP plus an authorized network B. Private IP (Private Services Access) C. Authorized network `0.0.0.0/0` D. Password in `index.php`
+
+<details>
+<summary>Answer to Q11</summary>
+
+**B, private IP.** You answered A, which is what the lab does. It works but sends traffic over the internet and relies on an allow-list. Private IP keeps both sides inside the VPC with no public exposure.
+
+</details>
+
+**Q12.** You must move 2 PB over a 1 Gbps link and it has to finish within weeks. What is the practical choice? A. Storage Transfer Service B. `gcloud storage cp` C. Transfer Appliance D. Console upload
+
+<details>
+<summary>Answer to Q12</summary>
+
+**C, Transfer Appliance.** You answered A. Storage Transfer Service still uses the network, so the 1 Gbps link caps it at about 185 days for 2 PB. A shipped appliance is the only option that fits weeks.
+
+</details>
+
+**Q13.** The bucket has Public access prevention enforced. You add an ACL giving `allUsers` read on one object. What happens? A. It works B. It is refused, public access is blocked C. It works for 1 hour D. Only signed-in users can read it
+
+<details>
+<summary>Answer to Q13</summary>
+
+**B, refused.** You answered A. Public access prevention overrides ACLs and IAM: it blocks `allUsers` and `allAuthenticatedUsers` however they are granted.
+
+</details>
+
+**Q14.** You delete a Coldline object on day 40. What are you charged? A. Nothing extra B. Storage for the remaining 50 days C. A read fee D. A full year
+
+<details>
+<summary>Answer to Q14</summary>
+
+**B** (you got it). The 90-day minimum is billed in full, so 50 more days of storage.
+
+</details>

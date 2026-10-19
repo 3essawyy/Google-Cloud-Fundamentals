@@ -37,6 +37,7 @@
   - [8.1 Deep dives on the slips](#part-8-1)
   - [8.2 Picking a class when you read the data](#part-8-2)
   - [8.3 Grill round 1: pick the letter](#part-8-3)
+  - [8.4 Grill round 2: pick the letter](#part-8-4)
 
 ---
 
@@ -843,5 +844,82 @@ You answered 1 to 6 on 2026-10-19 and got 5 of 6. Answers are in the dropdowns.
 <summary>Answer to Q6</summary>
 
 **B, Storage Transfer Service** (you got it). The source is online and the link is fast, so Google pulls the data directly. An appliance is for slow links or months-long uploads.
+
+</details>
+
+<a id="part-8-4"></a>
+### 8.4 Grill round 2: pick the letter
+
+You answered 7 to 14 on 2026-10-19 and got 5 of 8. The three slips (11, 12, 13) all came from picking the lab's shortcut or the obvious tool over what the situation needs.
+
+**Q7.** A dev emails you a link to a private file and it must stop working in 1 hour. What do you use? A. Make the object public B. Signed URL with a 1 hour expiry C. An ACL for `allUsers` D. Move it to Archive
+
+<details>
+<summary>Answer to Q7</summary>
+
+**B** (you got it). A signed URL carries its own permission and expires, so it is private and time-limited without needing an account.
+
+</details>
+
+**Q8.** Which class suits data read about once a year and kept for ten years? A. Standard B. Nearline C. Coldline D. Archive
+
+<details>
+<summary>Answer to Q8</summary>
+
+**D, Archive** (you got it). Rarely read and kept long, so the 365-day minimum costs you nothing and the storage price is lowest.
+
+</details>
+
+**Q9.** Versioning is on. You upload a file, then overwrite it 3 times. What does the bucket hold? A. Only the latest B. The latest plus 3 older versions C. Nothing, versioning needs Autoclass D. 3 copies in 3 regions
+
+<details>
+<summary>Answer to Q9</summary>
+
+**B** (you got it). 1 live version plus 3 noncurrent versions, 4 in total.
+
+</details>
+
+**Q10.** Data is kept exactly 90 days and read in full once, at the end. Cheapest class using the 8.2 prices? A. Standard B. Nearline C. Coldline D. Archive
+
+<details>
+<summary>Answer to Q10</summary>
+
+**C, Coldline** (you got it). Per GB: Standard about $0.060, Nearline $0.030 storage + $0.01 read = $0.040, Coldline $0.012 + $0.02 = $0.032, Archive $0.0144 (365 days billed) + $0.05 = $0.064.
+
+</details>
+
+**Q11.** Most secure way for the `bloghost` VM to reach Cloud SQL in production? A. Public IP plus an authorized network B. Private IP (Private Services Access) C. Authorized network `0.0.0.0/0` D. Password in `index.php`
+
+<details>
+<summary>Answer to Q11</summary>
+
+**B, private IP.** You answered A, which is what the lab does. It works but sends traffic over the internet and relies on an allow-list. Private IP keeps both sides inside the VPC with no public exposure.
+
+</details>
+
+**Q12.** You must move 2 PB over a 1 Gbps link and it has to finish within weeks. What is the practical choice? A. Storage Transfer Service B. `gcloud storage cp` C. Transfer Appliance D. Console upload
+
+<details>
+<summary>Answer to Q12</summary>
+
+**C, Transfer Appliance.** You answered A. Storage Transfer Service still uses the network, so the 1 Gbps link caps it at about 185 days for 2 PB. A shipped appliance is the only option that fits weeks.
+
+</details>
+
+**Q13.** The bucket has Public access prevention enforced. You add an ACL giving `allUsers` read on one object. What happens? A. It works B. It is refused, public access is blocked C. It works for 1 hour D. Only signed-in users can read it
+
+<details>
+<summary>Answer to Q13</summary>
+
+**B, refused.** You answered A. Public access prevention overrides ACLs and IAM: it blocks `allUsers` and `allAuthenticatedUsers` however they are granted.
+
+</details>
+
+**Q14.** You delete a Coldline object on day 40. What are you charged? A. Nothing extra B. Storage for the remaining 50 days C. A read fee D. A full year
+
+<details>
+<summary>Answer to Q14</summary>
+
+**B** (you got it). The 90-day minimum is billed in full, so 50 more days of storage.
 
 </details>

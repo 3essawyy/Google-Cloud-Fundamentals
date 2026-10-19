@@ -32,6 +32,7 @@
   - [7.2 Checklist](#part-7-2)
   - [7.3 Expected results and fixes](#part-7-3)
   - [7.4 Commands for the Gemini CLI agent](#part-7-4)
+  - [7.5 Cloud Shell, Git Bash and the bloghost SSH window](#part-7-5)
 
 ---
 
@@ -153,6 +154,42 @@ The trade-off is always the same: the colder the class, the **cheaper it is to s
 
 > **Where you meet this in Lab 3:** Task 3's `gsutil acl ch -u allUsers:R gs://$DEVSHELL_PROJECT_ID/my-excellent-blog.png` adds an ACL entry saying that `allUsers` (`-u`) gets Read (`:R`) on that one object. It works because a bucket created with `gcloud storage buckets create` and no extra flags keeps fine-grained access. [Part 5](#part-5) covers how you'd make the image public in a real project.
 
+#### ACL vs IAM in detail
+
+An **ACL** is a short list attached to one bucket or one object. Each entry is a **scope** (who) plus a **permission** (what). An **IAM** rule says "this member has this role on this resource", and it inherits downward from organization to folder, project, bucket and object.
+
+| | ACL | IAM |
+| :--- | :--- | :--- |
+| Where it applies | One bucket or one object | Organization, folder, project or bucket, inherited downward |
+| Who can be named | A user, a group, a domain, `allUsers`, `allAuthenticatedUsers` | Users, groups, service accounts, domains, `allUsers`, `allAuthenticatedUsers` |
+| What it grants | 3 fixed permissions: `READER`, `WRITER`, `OWNER` | Hundreds of roles, plus conditions such as an expiry time |
+| Works for | Cloud Storage only | Every Google Cloud service |
+| Review and audit | Object by object, hard at scale | One place, with audit logs |
+| Google's advice | Legacy: only for a one-off exception | The default for almost everything |
+
+**Example, the same goal both ways:** "everyone on the internet may read `my-excellent-blog.png`".
+
+- **ACL (the lab):** `gsutil acl ch -u allUsers:R gs://BUCKET/my-excellent-blog.png`. One entry on one object.
+- **IAM:** grant `allUsers` the role `roles/storage.objectViewer` on the bucket. Every object in the bucket becomes public, so keep that bucket for public files only.
+- **IAM, for one person:** grant a teammate `roles/storage.objectViewer` on the project, and they can read every object in every bucket, with no per-object setup.
+
+**What happens when both apply: who wins?** Nobody wins, because access is **additive**:
+
+| Situation | Result |
+| :--- | :--- |
+| IAM allows, ACL says nothing | ✅ Allowed |
+| ACL allows, IAM says nothing | ✅ Allowed |
+| Both allow | ✅ Allowed |
+| Neither allows | ❌ Denied (the default) |
+| ACL "denies"? | Not possible: an ACL can only grant, so there is no entry that denies |
+
+A request is allowed if **any** one of them grants it. The consequence for security: removing a permission in IAM does not close access that an ACL still grants, so you must check both. These settings do override everything else:
+
+- **Uniform bucket-level access** switches ACLs off for the bucket. Only IAM counts, which makes the picture simple. A bucket with ACLs on is called **fine-grained**.
+- **Public access prevention** blocks `allUsers` and `allAuthenticatedUsers`, whether the grant comes from an ACL or from IAM.
+
+> **Exam rule:** if a question asks how to control access to Cloud Storage, answer IAM, and uniform bucket-level access if it mentions turning ACLs off. Recognise ACLs in two cases: a question about access to a single object on a bucket where ACLs are still on, and `allUsers` in a command like the lab's.
+
 <a id="part-1-5"></a>
 ### 1.5 Encryption and getting data in
 
@@ -168,7 +205,7 @@ The trade-off is always the same: the colder the class, the **cheaper it is to s
 
 - **Integrations:** Cloud SQL and BigQuery import and export tables through Cloud Storage. Compute Engine startup scripts and images, and App Engine logs and assets, can live there too.
 
-> **Where you meet this in Lab 3:** both `gcloud storage cp` lines in Task 3. The first copies from Google's public `cloud-training` bucket into Cloud Shell, and the second uploads from Cloud Shell into your bucket.
+> **Where you meet this in Lab 3:** both `gcloud storage cp` lines in Task 3. The first downloads the banner from Google's public `cloud-training` bucket into **Cloud Shell's own disk**, and the second uploads it from there into your bucket. Cloud Shell is a terminal that lives in Google Cloud, not on your computer, so the file never touches your laptop. [7.5](#part-7-5) explains what Cloud Shell is and how it differs from Git Bash.
 
 ---
 
@@ -399,6 +436,20 @@ Transfer Appliance: lease it, fill it, ship it back. Storage Transfer Service is
 
 </details>
 
+<details>
+<summary><strong>Q14.</strong> An object's ACL gives <code>allUsers</code> read access, but nothing in IAM grants it. Can anyone on the internet read it? What if the bucket has uniform bucket-level access on?</summary>
+
+Yes on a fine-grained bucket: access is additive, so any one grant is enough and an ACL alone allows it. With uniform bucket-level access on, ACLs are ignored, so only IAM counts and the object is not readable. Public access prevention would block it either way.
+
+</details>
+
+<details>
+<summary><strong>Q15.</strong> In Task 3 you run <code>gcloud storage cp</code> in a terminal. Where does <code>my-excellent-blog.png</code> end up after the first copy?</summary>
+
+In Cloud Shell's home directory, on a small Linux VM in Google Cloud, not on your computer. The second copy uploads it from there into your bucket.
+
+</details>
+
 ---
 
 <a id="part-7"></a>
@@ -500,3 +551,41 @@ Do not run anything yourself.
 
 <PASTE COMMANDS>
 ```
+
+<a id="part-7-5"></a>
+### 7.5 Cloud Shell, Git Bash and the bloghost SSH window
+
+Lab 3 uses **two different terminals**. Mixing them up is the easiest way to get stuck.
+
+**What Cloud Shell is:** a Linux command line that runs on a small virtual machine Google gives you, opened inside the browser. In the console it is the `>_` icon in the top right toolbar (Activate Cloud Shell). You type into it from your browser, and the commands run on Google's machine, not on your laptop.
+
+- **Already set up:** `gcloud`, `gsutil`, `git`, `nano`, Python and more are installed. You are already signed in as the lab student user, and `$DEVSHELL_PROJECT_ID` already holds your project ID, which is why the lab names the bucket with it.
+- **Disk:** a persistent home directory of about 5 GB. Files you put in it stay. The machine itself is temporary: it stops after a period of inactivity, and a fresh one starts next time, so anything you installed elsewhere is gone.
+- **Cost:** free. In this lab it's part of the lab's allowance.
+- **Not your computer:** downloading in Cloud Shell does not save anything on your laptop. Use the editor or the Download option in the Cloud Shell menu if you ever need a file out.
+
+| | Git Bash (what you used so far) | Cloud Shell |
+| :--- | :--- | :--- |
+| Runs on | Your Windows computer | A Google Cloud VM, in your browser |
+| Shell | bash, through a Windows emulation layer | Real Linux bash (Debian) |
+| Your files | Your own folders (`/c/Users/...`) | Its own small home directory |
+| `gcloud` | Not installed until you install it and run `gcloud auth login` | Installed and already signed in |
+| Network | Your home connection | Google's network, so copies between Google Cloud services are fast |
+
+The commands look the same in both, because both are bash. What changes is **where they run** and **who you're signed in as**.
+
+**The two terminals in Lab 3:**
+
+| Task | Terminal | Where it runs | Why |
+| :--- | :--- | :--- | :--- |
+| Task 3: bucket, `gcloud storage cp`, ACL | **Cloud Shell** (`>_` icon) | A Google-managed VM, signed in as the lab user | It has `gcloud` and permission to create buckets |
+| Task 5 and 6: edit `index.php`, restart Apache | **SSH window on `bloghost`** (Compute Engine > VM instances > SSH) | Your `bloghost` VM, where Apache lives | The web files are on that VM, not in Cloud Shell |
+
+If `sudo service apache2 restart` says the service doesn't exist, you're in Cloud Shell and need the `bloghost` SSH window. If `gcloud storage ...` says you aren't logged in, you're on the wrong machine. The prompt shows the name: `student_...@cloudshell:~` against `...@bloghost:~`.
+
+**What happens in Task 3, step by step:**
+
+1. `gcloud storage cp gs://cloud-training/gcpfci/my-excellent-blog.png my-excellent-blog.png` reads from Google's public bucket and writes the file into Cloud Shell's current directory.
+2. `gcloud storage cp my-excellent-blog.png gs://$DEVSHELL_PROJECT_ID/my-excellent-blog.png` reads that local file and uploads it into your bucket.
+
+Copying bucket to bucket directly would also work. The lab goes through Cloud Shell to show both a download and an upload.

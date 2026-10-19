@@ -1,6 +1,6 @@
 # Google Cloud Labs Sprint & ACE Roadmap
 
-> As of 2026-10-17. Kept in sync with the Claude Doc of the same name: https://claude.ai/code/artifact/31099c7b-72f5-4f0c-8475-84e12a255181
+> As of 2026-10-19. Kept in sync with the Claude Doc of the same name: https://claude.ai/code/artifact/31099c7b-72f5-4f0c-8475-84e12a255181
 > All times are **Cairo time (EEST, UTC+3)**.
 
 All 4 labs are due **Wednesday 2026-10-21 at 23:59 Cairo time**. The plan is one lab a day, Saturday to Tuesday, each after its theory, with Wednesday kept as a buffer. After the labs, a 6-week exam-prep phase targets the **Associate Cloud Engineer (ACE)** exam in early December.
@@ -27,7 +27,7 @@ One lab a day after its theory, about 2.5 hours each evening; Wednesday is only 
 | Day | Theory first | Then the lab | Time |
 | --- | --- | --- | --- |
 | Sat 17 Oct | M0 Course Intro, M1 Introducing Google Cloud, M2 Resources and Access | Lab 1: Cloud Marketplace (LAMP) | ~2.5 h (**done**) |
-| Sun 18 Oct | M3 Virtual Machines and Networks | Lab 2: VPC Networking and Compute Engine | ~2.5 h |
+| Sun 18 Oct | M3 Virtual Machines and Networks | Lab 2: VPC Networking and Compute Engine | ~2.5 h (**done**) |
 | Mon 19 Oct | M4 Storage in the Cloud | Lab 3: Cloud Storage and Cloud SQL | ~3 h |
 | Tue 20 Oct | M5 Containers in the Cloud, M6 Applications in the Cloud | Lab 4: Hello Cloud Run | ~2.5 h |
 | Wed 21 Oct | M7 Course Summary, review the ACE anchors of all 4 labs | Redo any lab not at 100%. Deadline 23:59 | ~1.5 h |
@@ -39,8 +39,9 @@ If a day slips, do two labs the next day; Labs 1 and 2 are the shortest, so they
 | Date (Cairo) | Done | Notes |
 | --- | --- | --- |
 | Sat 17 Oct | Lab 1 (LAMP on Compute Engine) completed, all checks green | First deploy failed with a `setIamPolicy` permission error (probably propagation delay); redeploying worked. Lab 1 notes (M0 to M2) with quizzes and a four-round grill log written. |
+| Sun 18 Oct | Lab 2 (VPC Networking and Compute Engine) completed, all checks green | Done just after midnight. Deleting `allow-icmp`, `allow-custom` and `allow-ssh` behaved as expected (see the Lab Run Notes in the lab file). Lab 2 notes (M3) with a five-round grill log and a subnet refresher written. |
 
-**Next:** Sun 18 Oct, M3 notes and Lab 2 (VPC Networking and Compute Engine).
+**Next:** Mon 19 Oct, M4 notes and Lab 3 (Cloud Storage and Cloud SQL). Notes: [study-notes/Lab3_M4_Study_Notes.md](study-notes/Lab3_M4_Study_Notes.md).
 
 ## Lab checklists
 
@@ -67,17 +68,17 @@ gcloud compute firewall-rules list --format="table(name,sourceRanges.list(),allo
 
 Theory: [M3](modules/M3_Virtual_Machines_and_Networks/M3_Virtual_Machines_and_Networks_v2.md). Manual: [labs/02_VPC_and_Compute_Engine.md](labs/02_VPC_and_Compute_Engine.md).
 
-- [ ] Read M3 study guide
-- [ ] Task 1: look at the default network's subnets, routes and 4 firewall rules
-- [ ] Task 1: delete all default firewall rules, then delete the `default` network
-- [ ] Task 1: try to create a VM and see the "no network available" error, then Cancel
-- [ ] Task 2: create auto-mode VPC `mynetwork` with all firewall rules ticked
-- [ ] Task 2: create `mynet-us-vm` and `mynet-r2-vm` (E2, `e2-micro`) in the two zones the lab gives, then Check my progress
-- [ ] Task 3: SSH to `mynet-us-vm`, ping `mynet-r2-vm` internal and external IP (both work)
-- [ ] Task 3: delete `mynetwork-allow-icmp`, external ping fails, internal still works
-- [ ] Task 3: delete `mynetwork-allow-custom`, internal ping fails
-- [ ] Task 3: delete `mynetwork-allow-ssh`, SSH fails
-- [ ] All checks green, End Lab
+- [x] Read M3 study guide
+- [x] Task 1: look at the default network's subnets, routes and 4 firewall rules
+- [x] Task 1: delete all default firewall rules, then delete the `default` network
+- [x] Task 1: try to create a VM and see the "no network available" error, then Cancel
+- [x] Task 2: create auto-mode VPC `mynetwork` with all firewall rules ticked
+- [x] Task 2: create `mynet-us-vm` and `mynet-r2-vm` (E2, `e2-micro`) in the two zones the lab gives, then Check my progress
+- [x] Task 3: SSH to `mynet-us-vm`, ping `mynet-r2-vm` internal and external IP (both work)
+- [x] Task 3: delete `mynetwork-allow-icmp`, external ping fails, internal still works
+- [x] Task 3: delete `mynetwork-allow-custom`, internal ping fails
+- [x] Task 3: delete `mynetwork-allow-ssh`, SSH fails
+- [x] All checks green, End Lab
 
 The lab is Console-driven; the Console steps are what it grades. Command equivalents for Task 2 (replace `ZONE_1` and `ZONE_2` with the lab's zones):
 

@@ -35,6 +35,8 @@
   - [7.5 Cloud Shell, Git Bash and the bloghost SSH window](#part-7-5)
 - [PART 8 — Grill log: slips and the reasoning behind them](#part-8)
   - [8.1 Deep dives on the slips](#part-8-1)
+  - [8.2 Picking a class when you read the data](#part-8-2)
+  - [8.3 Grill round 1: pick the letter](#part-8-3)
 
 ---
 
@@ -716,6 +718,8 @@ It's the same idea as Lab 2, where the external ping arrived from the sender's e
 
 Private IP would remove all of this: both sides sit inside the VPC and see each other's internal addresses, with no public exposure.
 
+**Why not just use the internal address?** You can, and in production you should: that is Cloud SQL's **private IP**. It isn't the lab default because Cloud SQL does not live inside your VPC. Google runs it in its own managed network, so the VM's `10.x` address can't reach it until you set up **Private Services Access**, a one-time connection (a VPC peering) between your VPC and Google's network with a reserved address range. The lab skips that and uses the public IP plus one allowed address. Exam shorthand: "most secure way for a VM to reach Cloud SQL" means private IP.
+
 **Console:** SQL > `blog-db` > **Connections** > **Networking** tab > **Authorized networks** > Add a network.
 
 #### 6. Online transfer vs Transfer Appliance: do the maths (Q13)
@@ -737,3 +741,107 @@ That is why the question mentions "months". At that size the fastest route is a 
 The rule of thumb: if the online transfer would take longer than about a week, ask whether a shipped appliance is quicker.
 
 **Console:** Storage Transfer Service is in the Console under Data Transfer. Transfer Appliance is ordered through the Console's Transfer Appliance page.
+
+
+<a id="part-8-2"></a>
+### 8.2 Picking a class when you read the data
+
+Q1 of the grill showed the trap: the cheapest class is not just about **storage price**. Each class has two prices, and reads decide which wins.
+
+| Class | Storage per GB per month | Read fee per GB | Minimum days billed |
+| :--- | :--- | :--- | :--- |
+| Standard | about $0.020 | $0 | none |
+| Nearline | about $0.010 | about $0.01 | 30 |
+| Coldline | about $0.004 | about $0.02 | 90 |
+| Archive | about $0.0012 | about $0.05 | 365 |
+
+These are rough list prices to show the shape, check the pricing page for real ones.
+
+**Example A: logs kept exactly 20 days, never read.** Nearline bills its 30-day minimum, about $0.010 per GB. Standard for 20 days costs about $0.013. Coldline bills 90 days, about $0.012. **Nearline** wins. If you read them often, Standard wins because it has no read fee.
+
+**Example B: 100 GB read in full every 40 days, kept 4 months (3 reads).**
+
+| Class | Storage | Reads | Total |
+| :--- | :--- | :--- | :--- |
+| Standard | $8.00 | $0 | $8.00 |
+| Nearline | $4.00 | 3 × 100 × $0.01 = $3.00 | **$7.00** |
+| Coldline | $1.60 | 3 × 100 × $0.02 = $6.00 | $7.60 |
+
+**Nearline** wins, narrowly. Coldline saves about $0.006 per GB each month but costs $0.01 more per GB read, so it only wins if you read less often than about **every 50 days**. Reading once a quarter favours Coldline.
+
+**How the minimum works (the "floor"):**
+
+- **Reading never resets the clock and never triggers the minimum.** You pay the read fee each time and nothing else.
+- The minimum only bites if you **delete, overwrite or move the object to another class before the minimum days are up**. You are then charged storage for the remaining days (Coldline deleted on day 40 is billed for 50 more days).
+- Once past the minimum, billing is just per day kept.
+
+**Quick guide by how often you read:**
+
+| Read about | Class | Example |
+| :--- | :--- | :--- |
+| Every day or week | Standard | Website images, app uploads |
+| About monthly | Nearline | Last month's logs, monthly backups |
+| About quarterly | Coldline | Quarterly reports, disaster-recovery copies |
+| About yearly or less, kept for years | Archive | Compliance records, old tax or medical files |
+| No idea | Autoclass | Mixed files nobody can predict |
+
+**Console:** Cloud Storage > Create a bucket > **Choose a storage class**, or tick **Autoclass** to let Google decide.
+
+<a id="part-8-3"></a>
+### 8.3 Grill round 1: pick the letter
+
+You answered 1 to 6 on 2026-10-19 and got 5 of 6. Answers are in the dropdowns.
+
+**Q1.** Logs kept exactly 20 days, cheapest class? A. Standard B. Nearline C. Coldline D. Archive
+
+<details>
+<summary>Answer to Q1</summary>
+
+**B, Nearline.** You answered Standard. Standard has no minimum, which looks safe, but Nearline's 30-day minimum costs about $0.010 per GB against about $0.013 for 20 days of Standard. Coldline and Archive bill 90 and 365 days. See [8.2](#part-8-2).
+
+</details>
+
+**Q2.** Nobody knows which logs will still be read. What fits best? A. A lifecycle rule moving everything to Coldline after 30 days B. Autoclass C. Keep everything in Archive D. Delete after 30 days
+
+<details>
+<summary>Answer to Q2</summary>
+
+**B, Autoclass** (you got it). A lifecycle rule needs you to know the pattern in advance, and Autoclass watches each object and moves it for you.
+
+</details>
+
+**Q3.** `gsutil acl ch` fails with an error mentioning "uniform access". What is going on? A. Wrong bucket name B. The bucket uses uniform bucket-level access, so ACLs are off and you grant access with IAM C. Cloud Shell lacks permission D. The object is too large
+
+<details>
+<summary>Answer to Q3</summary>
+
+**B** (you got it). Uniform access switches ACLs off, so only IAM counts. See [8.1 item 3](#part-8-1).
+
+</details>
+
+**Q4.** A signed URL was emailed to the wrong person. What can they do? A. Nothing B. Use it until it expires, because the link is the key C. Use it only with a Google account D. Use it once
+
+<details>
+<summary>Answer to Q4</summary>
+
+**B** (you got it). A signed URL is not tied to a person, so anyone holding it can use it until the expiry.
+
+</details>
+
+**Q5.** A VM (`10.2.0.7`, external `34.1.2.3`) connects to a Cloud SQL public IP. Which address does Cloud SQL see and which goes in the authorized network? A. `10.2.0.7` B. `34.1.2.3` C. Either D. The Cloud SQL instance's own IP
+
+<details>
+<summary>Answer to Q5</summary>
+
+**B** (you got it). Traffic leaving for a public address is NAT-ed to the VM's external IP, so `34.1.2.3/32` goes on the list. You asked why not the internal address: that is private IP, which needs Private Services Access set up. See [8.1 item 5](#part-8-1).
+
+</details>
+
+**Q6.** Move 500 TB from another cloud's bucket into Cloud Storage over a fast link? A. Transfer Appliance B. Storage Transfer Service C. Dragging files in the Console D. Cloud Shell `cp`
+
+<details>
+<summary>Answer to Q6</summary>
+
+**B, Storage Transfer Service** (you got it). The source is online and the link is fast, so Google pulls the data directly. An appliance is for slow links or months-long uploads.
+
+</details>

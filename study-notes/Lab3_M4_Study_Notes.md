@@ -1,0 +1,502 @@
+# Lab 3 Study Notes: M4 Storage in the Cloud
+
+### Cloud Storage, Cloud SQL, Spanner, Firestore and Bigtable, condensed for Lab 3 and the ACE exam
+
+> **As of:** 2026-10-19 · **Sources:** the M4 `_v2.md` study guide in [modules/](../modules/M4_Storage_in_the_Cloud/M4_Storage_in_the_Cloud_v2.md) and the [Lab 3 manual](../labs/03_Storage_and_Cloud_SQL.md) · **Synced with:** the Claude Doc of the same name, https://claude.ai/code/artifact/4a079069-fa0a-4dba-87a0-a738ba77e75d
+
+---
+
+## Table of Contents
+
+- [PART 0 — What Lab 3 covers](#part-0)
+- [What each service does (M4)](#part-roles)
+- [PART 1 — Cloud Storage (≈ S3)](#part-1)
+  - [1.1 Objects, buckets and locations](#part-1-1)
+  - [1.2 Storage classes](#part-1-2)
+  - [1.3 Versioning, lifecycle rules and Autoclass](#part-1-3)
+  - [1.4 Access control: IAM, ACLs and public objects](#part-1-4)
+  - [1.5 Encryption and getting data in](#part-1-5)
+- [PART 2 — Cloud SQL (≈ RDS Postgres)](#part-2)
+  - [2.1 What Google manages for you](#part-2-1)
+  - [2.2 How a client connects](#part-2-2)
+- [PART 3 — Spanner, Firestore and Bigtable](#part-3)
+  - [3.1 Spanner](#part-3-1)
+  - [3.2 Firestore (≈ DynamoDB)](#part-3-2)
+  - [3.3 Bigtable](#part-3-3)
+  - [3.4 Where BigQuery fits](#part-3-4)
+- [PART 4 — Which storage do I pick?](#part-4)
+- [PART 5 — The lab's shortcuts vs how you'd do it properly](#part-5)
+- [PART 6 — M4 self-check quiz](#part-6)
+- [PART 7 — Bridge to Lab 3: Cloud Storage and Cloud SQL](#part-7)
+  - [7.1 What each step teaches](#part-7-1)
+  - [7.2 Checklist](#part-7-2)
+  - [7.3 Expected results and fixes](#part-7-3)
+  - [7.4 Commands for the Gemini CLI agent](#part-7-4)
+
+---
+
+<a id="part-0"></a>
+## PART 0 — What Lab 3 covers
+
+Lab 3 builds a tiny blog: a Compute Engine VM runs Apache and PHP, reads from a Cloud SQL MySQL database, and shows a banner image served from a Cloud Storage bucket.
+
+```mermaid
+%%{init: {'theme':'base'}}%%
+flowchart LR
+    U["You, in a browser"] -->|"http://BLOGHOST_EXTERNAL_IP/index.php"| VM["bloghost VM<br/>Apache + PHP<br/>(startup script)"]
+    VM -->|"MySQL on port 3306<br/>to the SQL public IP<br/>allowed: BLOGHOST_EXTERNAL_IP/32"| SQL["blog-db<br/>Cloud SQL for MySQL"]
+    U -->|"img src = storage.googleapis.com/BUCKET/my-excellent-blog.png"| GCS["Bucket named after the project ID<br/>Cloud Storage"]
+    style U fill:#16213e,stroke:#0f3460,color:#ffffff
+    style VM fill:#1a1a2e,stroke:#e94560,color:#ffffff
+    style SQL fill:#2d3436,stroke:#00b894,color:#ffffff
+    style GCS fill:#2d3436,stroke:#fdcb6e,color:#ffffff
+```
+
+Note that the image never passes through the VM: the page only holds its URL, and your browser fetches it straight from Cloud Storage.
+
+Everything below keeps what Lab 3 or the Associate Cloud Engineer (ACE) exam needs. **Cut:** agenda slides, marketing ("$400B"), and the client tool names (Toad, SQL Workbench). **Kept:** storage classes with their minimum durations, access control, Cloud SQL limits and connection options, and the "which storage do I pick" comparison. Spanner, Firestore and Bigtable never appear in the lab, but the exam asks about them often.
+
+> [!IMPORTANT]
+> **Lessons that carry over:** from Lab 1, if a step fails with a permission error right after an API was enabled, wait a minute or two and retry. From Lab 2, traffic to a public IP arrives from the sender's **external** IP, which is why Cloud SQL must allow `bloghost`'s external IP, not its internal one.
+
+---
+
+<a id="part-roles"></a>
+## What each service does (M4)
+
+**≈ AWS** appears only where it matches a service you already know: S3, RDS Postgres or DynamoDB.
+
+| Service | Role it plays | Familiar? |
+| :--- | :--- | :--- |
+| **Cloud Storage** | Stores files ("objects") of any size in buckets, reached by URL. Backups, media, website files, data for other services. Used in Lab 3 | ≈ **S3** |
+| **Cloud SQL** | A managed relational database (MySQL, PostgreSQL or SQL Server). Google patches, backs up and replicates it; you use it like a normal database. Used in Lab 3 | ≈ **RDS Postgres** |
+| **Spanner** | A relational SQL database that scales **horizontally**, across zones and regions, with strong consistency. For when one Cloud SQL server is not enough | Like RDS, but it grows by adding nodes |
+| **Firestore** | A serverless NoSQL **document** database for mobile and web apps, with real-time sync and offline support | ≈ **DynamoDB** |
+| **Bigtable** | A NoSQL **wide-column** database for huge, fast streams of data (IoT, time series, finance, ad tech), more than 1 TB | NoSQL like DynamoDB, but built for analytics at scale |
+| **BigQuery** | A data warehouse for SQL analytics over huge datasets. Covered in other courses; not a storage choice in M4 | |
+
+> **Key Idea:** M4 is one question asked five ways: *what shape is my data, and how big will it get?* Files go to Cloud Storage, relational data to Cloud SQL or Spanner, and NoSQL data to Firestore or Bigtable.
+
+---
+
+<a id="part-1"></a>
+## PART 1 — Cloud Storage (≈ S3)
+
+Cloud Storage is Google's **object storage**: you store whole files with their metadata under a unique name, and read them back by URL.
+
+<a id="part-1-1"></a>
+### 1.1 Objects, buckets and locations
+
+| Storage type | How data is kept | Google Cloud example |
+| :--- | :--- | :--- |
+| **File** | Folders and files in a hierarchy | Filestore |
+| **Block** | Raw chunks of a disk, used by an OS | Persistent Disk (a VM's boot disk) |
+| **Object** | Whole objects: the data, its metadata and a unique key (a URL) | **Cloud Storage** |
+
+- **Bucket:** the container for objects. Its name must be **globally unique** across all of Google Cloud, which is why the lab names it after your project ID. A bucket also has a **location**, fixed at creation.
+- **Location types:** a **region** (one region, lowest latency for users there), a **dual-region**, or a **multi-region** (`US`, `EU`, `ASIA`). Dual-region and multi-region store copies in separate places (geo-redundancy). Lab 3 uses a multi-region: pick the one nearest the lab's region.
+- **Objects are immutable.** You never edit an object in place: an upload with the same name replaces it with a new version.
+- **Size:** no minimum object size, up to **5 TB per object**, and no limit on the bucket.
+- **Durability** is 99.999999999% ("eleven nines") in every class. What changes with location is availability.
+- "Folders" in the console are only name prefixes (`images/a.png`). Cloud Storage is not a file system, though tools such as Cloud Storage FUSE can mount a bucket like one.
+
+> **Where you meet this in Lab 3:** Task 3 creates the bucket with `gcloud storage buckets create -l $LOCATION gs://$DEVSHELL_PROJECT_ID`.
+
+<a id="part-1-2"></a>
+### 1.2 Storage classes
+
+```mermaid
+%%{init: {'theme':'base'}}%%
+flowchart LR
+    S["Standard<br/>hot data<br/>no minimum"] -->|"read about monthly"| N["Nearline<br/>30-day minimum"]
+    N -->|"about quarterly"| C["Coldline<br/>90-day minimum"]
+    C -->|"under once a year"| A["Archive<br/>365-day minimum"]
+    style S fill:#1a1a2e,stroke:#e94560,color:#ffffff
+    style N fill:#16213e,stroke:#0f3460,color:#ffffff
+    style C fill:#2d3436,stroke:#00b894,color:#ffffff
+    style A fill:#2d3436,stroke:#fdcb6e,color:#ffffff
+```
+
+| Class | Access pattern | Minimum storage duration | Typical use |
+| :--- | :--- | :--- | :--- |
+| **Standard** | Frequent ("hot"), or kept only briefly | None | Website content, streaming, working data |
+| **Nearline** | About once a month or less | 30 days | Backups, long-tail media |
+| **Coldline** | About once a quarter or less | 90 days | Disaster recovery copies |
+| **Archive** | Less than once a year | 365 days | Regulatory archives |
+
+The trade-off is always the same: the colder the class, the **cheaper it is to store** a GB per month and the **more it costs to read** it back (a retrieval fee per GB). Deleting an object before its minimum duration is charged as if it stayed the full period.
+
+**Common to all four classes:** unlimited storage, worldwide access, low latency (Archive is not slow to read, only expensive), eleven-nines durability, and the same API, tools and security. That last point is why a quiz answer saying a class "is more secure" or "has a faster API" is always wrong.
+
+> **Where you meet this in Lab 3:** the lab bucket uses the default, **Standard**, because a blog banner is read on every page view.
+
+<a id="part-1-3"></a>
+### 1.3 Versioning, lifecycle rules and Autoclass
+
+- **Object Versioning (off by default):** when on, an overwrite or delete keeps the old copy as a **noncurrent version**. You can list versions, restore one, or delete one for good. When off, a new upload simply replaces the old object.
+- **Lifecycle rules:** the bucket acts on objects for you. The two actions are **Delete** and **SetStorageClass**, triggered by conditions such as age, creation date or number of newer versions. The course's examples: delete objects older than 365 days, delete objects created before 1 January 2013, or keep only the 3 newest versions.
+- **Autoclass:** moves each object to a colder class when it isn't read and back to Standard when it is, per object. Use it when you can't predict the access pattern; use lifecycle rules when you can.
+
+> **Where you meet this in Lab 3:** nowhere. The lab doesn't turn these on, but they are common exam questions on cutting storage cost.
+
+<a id="part-1-4"></a>
+### 1.4 Access control: IAM, ACLs and public objects
+
+| Mechanism | Granularity | Use it when |
+| :--- | :--- | :--- |
+| **IAM roles** | Project or bucket, inherited down to the objects | Almost always. Example: `roles/storage.objectViewer` on the bucket |
+| **ACLs** (access control lists) | One object at a time. Each entry is a **scope** (who) plus a **permission** (READER, WRITER, OWNER) | Only when one object needs different access from its neighbours |
+| **Signed URL** | One object, one link, for a limited time | Give someone without a Google account temporary access |
+
+- **Uniform bucket-level access** turns ACLs off for a bucket so that only IAM applies. Google recommends it, and buckets created in the console use it by default. The other setting, **fine-grained**, keeps ACLs on.
+- **Public access:** the special principal `allUsers` means anyone on the internet. Granting it read access makes an object reachable at `https://storage.googleapis.com/BUCKET/OBJECT`. **Public access prevention**, a bucket setting or an organization policy, blocks this entirely.
+
+> **Where you meet this in Lab 3:** Task 3's `gsutil acl ch -u allUsers:R gs://$DEVSHELL_PROJECT_ID/my-excellent-blog.png` adds an ACL entry saying that `allUsers` (`-u`) gets Read (`:R`) on that one object. It works because a bucket created with `gcloud storage buckets create` and no extra flags keeps fine-grained access. [Part 5](#part-5) covers how you'd make the image public in a real project.
+
+<a id="part-1-5"></a>
+### 1.5 Encryption and getting data in
+
+- **Encryption at rest is always on**, at no extra cost: Google encrypts data on the server before writing it to disk. Data in transit between you and Google uses HTTPS/TLS. If you need to control the key, the options are a key you manage in Cloud KMS (**CMEK**), or a key you supply with each request (**CSEK**).
+- **Pricing:** no minimum fee and nothing to provision; you pay for storage used, operations, retrieval (in the colder classes) and network egress.
+- **Getting data in:**
+
+| Amount and source | Tool |
+| :--- | :--- |
+| Files from your machine or Cloud Shell | `gcloud storage cp`, or drag and drop in the console |
+| Terabytes online, from another cloud, another bucket or an HTTP(S) source, scheduled | **Storage Transfer Service** |
+| Petabytes, offline: a server you lease, fill and ship back | **Transfer Appliance** (up to 1 PB each) |
+
+- **Integrations:** Cloud SQL and BigQuery import and export tables through Cloud Storage. Compute Engine startup scripts and images, and App Engine logs and assets, can live there too.
+
+> **Where you meet this in Lab 3:** both `gcloud storage cp` lines in Task 3. The first copies from Google's public `cloud-training` bucket into Cloud Shell, and the second uploads from Cloud Shell into your bucket.
+
+---
+
+<a id="part-2"></a>
+## PART 2 — Cloud SQL (≈ RDS Postgres)
+
+Cloud SQL runs **MySQL, PostgreSQL or SQL Server** for you. It's the same idea as RDS: you get a database endpoint, and Google runs the server underneath.
+
+<a id="part-2-1"></a>
+### 2.1 What Google manages for you
+
+- **The chores Google takes over:** installing, patching and updating the database, managed backups, and replication.
+- **Limits:** up to **128 vCPUs, 864 GB of RAM and 64 TB of storage** per instance. It scales **vertically**, meaning a bigger machine. **Read replicas** spread read traffic, but writes always go to the one primary.
+- **Backups:** automated and on-demand backups. The instance price **covers 7 backups**. Point-in-time recovery uses the binary logs to restore to a moment between backups.
+- **High availability:** a **regional** instance keeps a standby in a second zone and fails over automatically. A **single zone** instance, as in the lab, has no standby.
+- **Security:** data is encrypted on Google's internal network, in tables, in temporary files and in backups. Each instance has its own network firewall: nothing can connect until you authorize it.
+- **Editions:** Enterprise and Enterprise Plus (faster and with a higher SLA). The lab uses Enterprise with the **Sandbox** preset, the smallest and cheapest configuration.
+
+<a id="part-2-2"></a>
+### 2.2 How a client connects
+
+```mermaid
+%%{init: {'theme':'base'}}%%
+flowchart TB
+    Q{"Where is the client?"} -->|"In the same VPC"| P["Private IP<br/>traffic never leaves Google's network"]
+    Q -->|"Anywhere, IAM-checked and encrypted"| AP["Cloud SQL Auth Proxy or connector<br/>no authorized networks needed"]
+    Q -->|"A fixed public IP"| PUB["Public IP + authorized network<br/>e.g. VM_EXTERNAL_IP/32 (Lab 3)"]
+    style Q fill:#16213e,stroke:#0f3460,color:#ffffff
+    style P fill:#2d3436,stroke:#00b894,color:#ffffff
+    style AP fill:#2d3436,stroke:#00b894,color:#ffffff
+    style PUB fill:#1a1a2e,stroke:#e94560,color:#ffffff
+```
+
+| Option | How it works | When |
+| :--- | :--- | :--- |
+| **Public IP + authorized networks** | The instance gets a public IP, and you list the CIDR ranges allowed to connect. A `/32` is exactly one address | Labs, or a client with a fixed IP. Turn SSL on in real use |
+| **Private IP** | The instance gets an internal IP inside your VPC, through private services access | Production apps on Compute Engine, GKE or Cloud Run in the same VPC |
+| **Cloud SQL Auth Proxy, connectors** | A small client checks your IAM permission and opens an encrypted tunnel; no IP list to maintain | Recommended whenever you can install it |
+
+- Put the database in the **same region, ideally the same zone, as the app**: every query crosses that gap, so distance adds latency to each one.
+- Any app with a standard MySQL driver can connect, PHP's PDO in the lab included.
+
+> **Where you meet this in Lab 3:** Task 4 creates `blog-db` with a public IP, adds user `blogdbuser`, and authorizes `BLOGHOST_EXTERNAL_IP/32` as the network "web front end". It must be the **external** IP: `bloghost` reaches the SQL public IP over the internet path, so its packets arrive from its external address (the same Lab 2 lesson). Task 5's `index.php` then connects with `new PDO("mysql:host=CLOUDSQLIP;dbname=mysql", ...)`.
+
+---
+
+<a id="part-3"></a>
+## PART 3 — Spanner, Firestore and Bigtable
+
+You won't meet any of these in Lab 3. Learn each one's niche and the keywords that point to it, because that is what the exam tests.
+
+<a id="part-3-1"></a>
+### 3.1 Spanner
+
+- A fully managed **relational** database that **scales horizontally**: add nodes and it grows to petabytes, across zones or across regions.
+- **Strongly (externally) consistent** worldwide, with SQL, joins and secondary indexes, and up to **99.999% availability** in multi-region configurations.
+- **Pick it when** the question says relational or SQL **and** global, horizontal scale, petabytes, or tens of thousands of reads and writes per second. It's the next step when Cloud SQL's 64 TB or single primary is not enough.
+
+<a id="part-3-2"></a>
+### 3.2 Firestore (≈ DynamoDB)
+
+- A serverless, horizontally scaling **NoSQL document** database for **mobile, web and server** apps.
+- **Data model:** **documents** of key-value pairs (which can hold nested objects) grouped into **collections**, and a document can hold **subcollections**. Each document can be up to 1 MB.
+- **Queries** can chain filters and sort. Every query is indexed, so its speed depends on the size of the **result**, not of the dataset.
+- **Offline and real-time sync:** the app caches the data it uses, keeps reading and writing offline, and syncs changes when it reconnects. Connected devices get updates as they happen.
+- Behind it: automatic multi-region replication, strong consistency, atomic batch operations and transactions.
+- **Pick it when** the question says mobile or web app, real-time updates, offline, or a flexible schema.
+
+<a id="part-3-3"></a>
+### 3.3 Bigtable
+
+- Google's **NoSQL wide-column** big-data database, the one behind Search, Analytics, Maps and Gmail. It offers consistent low latency at very high throughput.
+- **Pick it when** you see more than **1 TB**, fast or rapidly changing data, **time series** or data with a natural order, **IoT**, financial or ad-tech data, or machine learning on the data.
+- **It is not SQL:** no SQL queries and no multi-row transactions. Each row is looked up by its **row key**, so designing that key well is how you get fast reads. Limits are 10 MB per cell and 100 MB per row.
+- **Data in and out:** through APIs (the HBase client, the HBase REST server), streaming (Dataflow, Spark Streaming, Storm), or batch jobs (Hadoop MapReduce, Dataflow, Spark).
+
+<a id="part-3-4"></a>
+### 3.4 Where BigQuery fits
+
+BigQuery isn't in M4's comparison because it is a **data warehouse**: you put data there to run SQL analytics over it, not to serve an app. If a question says "analytics", "data warehouse" or "SQL over petabytes for reports", answer BigQuery. If it says "serve users with low-latency reads and writes", it's one of the five M4 services.
+
+---
+
+<a id="part-4"></a>
+## PART 4 — Which storage do I pick?
+
+```mermaid
+%%{init: {'theme':'base'}}%%
+flowchart TB
+    Q{"What is the data?"} -->|"Files: images, video, backups"| CS["Cloud Storage"]
+    Q -->|"Relational, needs SQL and transactions"| R{"One server enough?<br/>(up to 64 TB)"}
+    R -->|"Yes"| SQL["Cloud SQL"]
+    R -->|"No: global, horizontal, PB"| SP["Spanner"]
+    Q -->|"NoSQL"| N{"What kind of workload?"}
+    N -->|"Mobile or web app, documents, real-time, offline"| FS["Firestore"]
+    N -->|"Huge analytical or time-series streams, over 1 TB"| BT["Bigtable"]
+    style Q fill:#16213e,stroke:#0f3460,color:#ffffff
+    style R fill:#16213e,stroke:#0f3460,color:#ffffff
+    style N fill:#16213e,stroke:#0f3460,color:#ffffff
+    style CS fill:#2d3436,stroke:#fdcb6e,color:#ffffff
+    style SQL fill:#2d3436,stroke:#00b894,color:#ffffff
+    style SP fill:#2d3436,stroke:#00b894,color:#ffffff
+    style FS fill:#1a1a2e,stroke:#e94560,color:#ffffff
+    style BT fill:#1a1a2e,stroke:#e94560,color:#ffffff
+```
+
+| Service | Type | Best for | Capacity | Max unit size | Keywords in a question |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Cloud Storage** | Object | Immutable blobs over 10 MB: images, movies, backups | Petabytes | 5 TB per object | files, media, archive, backup, static website |
+| **Cloud SQL** | Relational | Full SQL for online transactions (OLTP); web frameworks and existing apps (user accounts, orders) | Up to 64 TB | | MySQL, PostgreSQL, SQL Server, lift and shift |
+| **Spanner** | Relational | Full SQL for OLTP **plus horizontal scale** | Petabytes | | global, horizontally scalable, strong consistency, 99.999% |
+| **Firestore** | NoSQL document | Massive scale with real-time queries and offline support, for mobile and web apps | Terabytes | 1 MB per document | mobile, real-time sync, offline |
+| **Bigtable** | NoSQL wide-column | Lots of structured objects, heavy reads and writes, analytics. No SQL, no multi-row transactions | Petabytes | 10 MB per cell, 100 MB per row | IoT, time series, ad tech, financial, HBase |
+
+> **Key Idea:** read the question for two things: **does it need SQL?** and **how big, and how global?** Those two answers pick the service in nearly every case. One app can use several of them, as the lab does with Cloud SQL and Cloud Storage.
+
+---
+
+<a id="part-5"></a>
+## PART 5 — The lab's shortcuts vs how you'd do it properly
+
+The lab manual itself flags three shortcuts. Follow the lab exactly as written, because its checks expect these steps; just know what a real project does instead, since the exam asks for that version.
+
+| Where in the manual | What the lab does | Why the lab does it | The proper way (exam answer) |
+| :--- | :--- | :--- | :--- |
+| **Task 3**, last step | `gsutil acl ch -u allUsers:R ...` makes one object public through an ACL | One command, no IAM setup, and it shows ACLs exist | Turn on **uniform bucket-level access** and grant `allUsers` the role `roles/storage.objectViewer` on a bucket kept only for public files, or give a **signed URL** if access should be temporary. For heavy traffic, put Cloud CDN in front. Also, `gsutil` is the legacy tool, and `gcloud storage` is its replacement |
+| **Task 4**, Security | "Allow unencrypted network traffic (**not recommended**)" and a **public IP** with an authorized network `/32` | The PHP page connects with no SSL certificate, so the lab stays short | **Private IP** in the app's VPC, or the **Cloud SQL Auth Proxy** (IAM check plus an encrypted tunnel). If you need a public IP, require SSL/TLS |
+| **Task 5**, the PHP comment | The database password sits in `index.php`, inside the web root | Keeps the lab to one file | Keep the password in **Secret Manager** and have the VM's service account read it at runtime, or use IAM database authentication and have no password at all |
+
+> [!WARNING]
+> In Task 4, authorize `bloghost`'s **external** IP followed by `/32`. Its internal IP, or the sample `35.192.208.2`, will leave the page stuck on "Database connection failed".
+
+---
+
+<a id="part-6"></a>
+## PART 6 — M4 self-check quiz
+
+Q1 to Q3 are the course's own module quiz.
+
+<details>
+<summary><strong>Q1.</strong> Which use case suits Cloud Storage best: a VM's root file system, unstructured data needing high durability and availability, an enterprise data warehouse, or a transactional RDBMS?</summary>
+
+Unstructured data needing high durability and availability. A VM boots from Persistent Disk or Hyperdisk, which are block storage; the data warehouse is BigQuery; and transactional relational databases are Cloud SQL or Spanner.
+
+</details>
+
+<details>
+<summary><strong>Q2.</strong> A company needs a relational database that scales horizontally to petabytes while staying highly available. Spanner, Cloud SQL, Bigtable or Firestore?</summary>
+
+Spanner. Cloud SQL scales vertically and caps at 64 TB, and Bigtable and Firestore are NoSQL.
+
+</details>
+
+<details>
+<summary><strong>Q3.</strong> What is the main reason to choose Coldline?</summary>
+
+To keep monthly storage cost low for data read less than once a quarter. Coldline isn't more secure, and doesn't use a faster API: every class shares the same security and API. And it's a bad choice for frequently read data, because of its retrieval fees.
+
+</details>
+
+<details>
+<summary><strong>Q4.</strong> Why does the lab name the bucket after the project ID?</summary>
+
+Bucket names must be globally unique across all of Google Cloud, and a project ID already is.
+
+</details>
+
+<details>
+<summary><strong>Q5.</strong> You put backups in Archive and delete them after 60 days. What do you pay for?</summary>
+
+The full 365-day minimum storage duration: deleting early is charged as if the object stayed the whole year. With a 60-day life, Nearline (30-day minimum) is the better fit.
+
+</details>
+
+<details>
+<summary><strong>Q6.</strong> Logs must move to Coldline after 90 days and be deleted after a year, with no one doing it by hand. Which feature?</summary>
+
+A lifecycle rule with two actions: SetStorageClass to Coldline at age 90 days, and Delete at age 365 days. Autoclass is for unpredictable access; here the schedule is known.
+
+</details>
+
+<details>
+<summary><strong>Q7.</strong> Someone overwrote an important object. What would have let you get the old copy back?</summary>
+
+Object Versioning on the bucket. The overwrite would have kept the old copy as a noncurrent version, which you could restore.
+
+</details>
+
+<details>
+<summary><strong>Q8.</strong> In Lab 3, why does <code>gsutil acl ch</code> work on your bucket, and when would it fail?</summary>
+
+The bucket was created with <code>gcloud storage buckets create</code> and no extra flags, so it uses fine-grained access and ACLs apply. It fails if uniform bucket-level access is on, since that turns ACLs off, or if public access prevention blocks <code>allUsers</code>.
+
+</details>
+
+<details>
+<summary><strong>Q9.</strong> A contractor without a Google account needs to download one file for the next 2 hours. What do you give them?</summary>
+
+A signed URL that expires after 2 hours. No IAM change, and the object doesn't become public.
+
+</details>
+
+<details>
+<summary><strong>Q10.</strong> Why does Lab 3 authorize <code>bloghost</code>'s external IP, and not its internal IP, on <code>blog-db</code>?</summary>
+
+The VM connects to the database's public IP, so the connection leaves through the VM's external address and arrives from it. The internal <code>10.x</code> address is never what Cloud SQL sees on that path. Private IP would be the way to connect internally.
+
+</details>
+
+<details>
+<summary><strong>Q11.</strong> A mobile app needs data that syncs between users' phones in real time and keeps working offline. Which database?</summary>
+
+Firestore.
+
+</details>
+
+<details>
+<summary><strong>Q12.</strong> Millions of IoT sensors write readings every second (many TB), and dashboards read recent values by sensor and time. Which database?</summary>
+
+Bigtable: time series, high throughput, more than 1 TB, read by row key (sensor ID plus time). It has no SQL or multi-row transactions, which this workload doesn't need.
+
+</details>
+
+<details>
+<summary><strong>Q13.</strong> You must move 2 PB from your data centre to Cloud Storage, and your link would take months. Which tool?</summary>
+
+Transfer Appliance: lease it, fill it, ship it back. Storage Transfer Service is for online transfers, such as from another cloud or an HTTP source.
+
+</details>
+
+---
+
+<a id="part-7"></a>
+## PART 7 — Bridge to Lab 3: Cloud Storage and Cloud SQL
+
+About 45 minutes plus the wait for Cloud SQL, all in the Console except Task 3 (Cloud Shell). The lab shows you its region and zone: use the same ones for `bloghost` and `blog-db`.
+
+<a id="part-7-1"></a>
+### 7.1 What each step teaches
+
+| In the lab you... | The theory behind it |
+| :--- | :--- |
+| Create `bloghost` with a **startup script** and **Allow HTTP traffic** | The script runs as root at boot and installs Apache and PHP. The checkbox adds the `http-server` network tag, which a firewall rule allowing `tcp:80` matches (Lab 2's tags) |
+| Note both of the VM's IPs | You need the **external** one for Cloud SQL and for the browser |
+| Create a bucket named after the project ID, in `US`, `EU` or `ASIA` | Globally unique names, multi-region location ([1.1](#part-1-1)) |
+| `gcloud storage cp` twice | Download from a public bucket, upload to yours ([1.5](#part-1-5)) |
+| `gsutil acl ch -u allUsers:R` | A per-object ACL makes one object public ([1.4](#part-1-4), [Part 5](#part-5)) |
+| Create `blog-db`: MySQL, Enterprise, Sandbox, single zone, same zone as the VM | Managed MySQL, no HA standby, kept close to the app ([2.1](#part-2-1), [2.2](#part-2-2)) |
+| Add the user `blogdbuser` and the authorized network `BLOGHOST_EXTERNAL_IP/32` | Cloud SQL's firewall allows no one until you list them ([2.2](#part-2-2)) |
+| See "Database connection failed", then fill in the IP and password and get "Connected successfully" | The app, not the lab, holds the connection settings ([Part 5](#part-5)) |
+| Add `<img src='https://storage.googleapis.com/...'>` | The browser fetches the object straight from Cloud Storage by its public URL |
+
+<a id="part-7-2"></a>
+### 7.2 Checklist
+
+- [ ] Read this M4 section and the lab manual
+- [ ] Start the lab, open the console in an incognito window with the lab student account
+- [ ] Task 2: Compute Engine > VM instances > Create instance: name `bloghost`, the lab's region and zone, `e2-standard-2`
+- [ ] Task 2: OS and storage: Debian GNU/Linux 12 (bookworm); Networking: tick **Allow HTTP traffic**
+- [ ] Task 2: Advanced > Automation > **Startup script** (the right field), paste the script, Create
+- [ ] Task 2: note `bloghost`'s internal and external IP, then Check my progress
+- [ ] Task 3: open Cloud Shell, `export LOCATION=` the multi-region nearest the lab region, create the bucket, copy the image down and up, run the ACL command, then Check my progress
+- [ ] Task 4: Cloud SQL > Create instance > MySQL > **Enterprise**, preset **Sandbox**, ID `blog-db`, password `Passw0rd1!`, the lab's region, Single zone, primary zone = `bloghost`'s zone
+- [ ] Task 4: Show configuration options > Security > **Allow unencrypted network traffic**, Create instance, then wait a few minutes
+- [ ] Task 4: copy the SQL **Public IP address**; Users > Add user account `blogdbuser` / `Passw0rd1!`, wait until it's created
+- [ ] Task 4: Connections > Networking > Add a network: name `web front end`, network `BLOGHOST_EXTERNAL_IP/32`, Done, **Save** (if "Another operation is in progress", wait), then Check my progress
+- [ ] Task 5: SSH to `bloghost`, `cd /var/www/html`, `sudo nano index.php`, paste the PHP, save, `sudo service apache2 restart`
+- [ ] Task 5: open `http://BLOGHOST_EXTERNAL_IP/index.php` and see "Database connection failed"
+- [ ] Task 5: edit again, replace `CLOUDSQLIP` with the SQL public IP and `DBPASSWORD` with `Passw0rd1!` (keep the quotes), restart Apache, reload and see "Connected successfully"
+- [ ] Task 6: Cloud Storage > Buckets > your bucket > copy the object's **Public link**
+- [ ] Task 6: edit `index.php`, add `<img src='PUBLIC_URL'>` on a new line just above the `<h1>` line, restart Apache, reload and see the banner
+- [ ] All checks green, End Lab
+
+<a id="part-7-3"></a>
+### 7.3 Expected results and fixes
+
+| Moment | You should see | If not |
+| :--- | :--- | :--- |
+| Right after creating `bloghost` | The VM running, with an external IP | Wait for the startup script, since installing Apache takes a minute or two |
+| After the ACL command | The object's Public access column shows a link | Refresh the page. If there's still no link, rerun the command and read its error. "Uniform bucket-level access" in the error means the bucket wasn't created with the lab's command |
+| Saving the authorized network | A green check on `blog-db` | "Another operation is in progress": wait for the instance or user creation to finish, then Save again |
+| First page load | `Database connection failed: ...` | That's expected, since the placeholders aren't filled in yet. If the page doesn't load at all, check you used `http://` and the **external** IP, and that Allow HTTP was ticked |
+| After filling in the IP and password | `Connected successfully` | Check the SQL **public** IP, the password (quotes kept), that the authorized network is the VM's external IP with `/32`, that unencrypted traffic is allowed, and that you restarted Apache |
+| After adding the image | The banner above the heading | Use the URL from your own bucket, not the sample one, and keep both quote marks and the closing `>` |
+
+> [!TIP]
+> Start Cloud SQL (Task 4) as soon as you have `bloghost`'s external IP: it's the slowest step, and you can do Task 3 in Cloud Shell while it creates.
+
+<a id="part-7-4"></a>
+### 7.4 Commands for the Gemini CLI agent
+
+Task 3, in Cloud Shell (pick `US`, `EU` or `ASIA`, whichever is nearest the lab region):
+
+```bash
+export LOCATION=US
+gcloud storage buckets create -l $LOCATION gs://$DEVSHELL_PROJECT_ID
+gcloud storage cp gs://cloud-training/gcpfci/my-excellent-blog.png my-excellent-blog.png
+gcloud storage cp my-excellent-blog.png gs://$DEVSHELL_PROJECT_ID/my-excellent-blog.png
+gsutil acl ch -u allUsers:R gs://$DEVSHELL_PROJECT_ID/my-excellent-blog.png
+```
+
+Optional checks in Cloud Shell; the lab grades the Console steps:
+
+```bash
+gcloud compute instances list
+gcloud storage ls -L gs://$DEVSHELL_PROJECT_ID/my-excellent-blog.png
+gcloud sql instances list
+gcloud sql instances describe blog-db --format="value(ipAddresses[0].ipAddress, settings.ipConfiguration.authorizedNetworks)"
+gcloud sql users list --instance=blog-db
+curl -s http://BLOGHOST_EXTERNAL_IP/index.php
+```
+
+On `bloghost` (SSH window), if the page doesn't load:
+
+```bash
+sudo systemctl status apache2 --no-pager
+sudo journalctl -u google-startup-scripts --no-pager | tail -20
+```
+
+Prompt to paste into the Gemini CLI agent before running anything:
+
+```text
+I'm doing Google Cloud Skills Boost lab "Getting Started with Cloud Storage and Cloud SQL" in Cloud Shell.
+Lab region: <REGION>; zone: <ZONE>; project: <PROJECT_ID>; bloghost external IP: <IP>.
+Check these commands against labs/03_Storage_and_Cloud_SQL.md in this repo.
+Replace placeholders with my values, flag anything that won't work in
+Cloud Shell, and explain in one line what each command does.
+Do not run anything yourself.
+
+<PASTE COMMANDS>
+```

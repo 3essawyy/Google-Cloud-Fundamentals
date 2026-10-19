@@ -28,7 +28,7 @@ One lab a day after its theory, about 2.5 hours each evening; Wednesday is only 
 | --- | --- | --- | --- |
 | Sat 17 Oct | M0 Course Intro, M1 Introducing Google Cloud, M2 Resources and Access | Lab 1: Cloud Marketplace (LAMP) | ~2.5 h (**done**) |
 | Sun 18 Oct | M3 Virtual Machines and Networks | Lab 2: VPC Networking and Compute Engine | ~2.5 h (**done**) |
-| Mon 19 Oct | M4 Storage in the Cloud | Lab 3: Cloud Storage and Cloud SQL | ~3 h |
+| Mon 19 Oct | M4 Storage in the Cloud | Lab 3: Cloud Storage and Cloud SQL | ~3 h (**done**) |
 | Tue 20 Oct | M5 Containers in the Cloud, M6 Applications in the Cloud | Lab 4: Hello Cloud Run | ~2.5 h |
 | Wed 21 Oct | M7 Course Summary, review the ACE anchors of all 4 labs | Redo any lab not at 100%. Deadline 23:59 | ~1.5 h |
 
@@ -40,8 +40,9 @@ If a day slips, do two labs the next day; Labs 1 and 2 are the shortest, so they
 | --- | --- | --- |
 | Sat 17 Oct | Lab 1 (LAMP on Compute Engine) completed, all checks green | First deploy failed with a `setIamPolicy` permission error (probably propagation delay); redeploying worked. Lab 1 notes (M0 to M2) with quizzes and a four-round grill log written. |
 | Sun 18 Oct | Lab 2 (VPC Networking and Compute Engine) completed, all checks green | Done just after midnight. Deleting `allow-icmp`, `allow-custom` and `allow-ssh` behaved as expected (see the Lab Run Notes in the lab file). Lab 2 notes (M3) with a five-round grill log and a subnet refresher written. |
+| Mon 19 Oct | Lab 3 (Cloud Storage and Cloud SQL) completed | Lab 3 notes (M4) with a four-round grill log (storage classes and read costs, ACL vs IAM, signed URLs, Cloud SQL public vs private IP, transfer maths) written and merged. |
 
-**Next:** Mon 19 Oct, M4 notes and Lab 3 (Cloud Storage and Cloud SQL). Notes: [study-notes/Lab3_M4_Study_Notes.md](study-notes/Lab3_M4_Study_Notes.md).
+**Next:** Tue 20 Oct, M5 and M6 notes and Lab 4 (Hello Cloud Run).
 
 ## Lab checklists
 
@@ -104,15 +105,15 @@ ping -c 3 MYNET_R2_VM_EXTERNAL_IP
 
 Theory: [M4](modules/M4_Storage_in_the_Cloud/M4_Storage_in_the_Cloud_v2.md). Manual: [labs/03_Storage_and_Cloud_SQL.md](labs/03_Storage_and_Cloud_SQL.md).
 
-- [ ] Read M4 study guide
-- [ ] Task 2: create VM `bloghost` (lab region and zone, `e2-standard-2`, Debian 12, Allow HTTP, startup script below), note its internal and external IP
-- [ ] Task 3: in Cloud Shell create the bucket, copy the image, make it public (commands below)
-- [ ] Task 4: start this early, it takes several minutes. Cloud SQL > MySQL > Enterprise, preset Sandbox, ID `blog-db`, password `Passw0rd1!`, same region and zone as `bloghost`, single zone, Security: allow unencrypted traffic
-- [ ] Task 4: copy the SQL Public IP, add user `blogdbuser` / `Passw0rd1!`
-- [ ] Task 4: Connections > Networking > Add network `web front end` = `BLOGHOST_EXTERNAL_IP/32`, Save
-- [ ] Task 5: SSH to `bloghost`, write `index.php`, see "Database connection failed", then fill in the SQL IP and password, see "Connected successfully"
-- [ ] Task 6: add the `<img src='...'>` line with the bucket's public URL above the `<h1>`, reload and see the banner
-- [ ] All checks green, End Lab
+- [x] Read M4 study guide
+- [x] Task 2: create VM `bloghost` (lab region and zone, `e2-standard-2`, Debian 12, Allow HTTP, startup script below), note its internal and external IP
+- [x] Task 3: in Cloud Shell create the bucket, copy the image, make it public (commands below)
+- [x] Task 4: start this early, it takes several minutes. Cloud SQL > MySQL > Enterprise, preset Sandbox, ID `blog-db`, password `Passw0rd1!`, same region and zone as `bloghost`, single zone, Security: allow unencrypted traffic
+- [x] Task 4: copy the SQL Public IP, add user `blogdbuser` / `Passw0rd1!`
+- [x] Task 4: Connections > Networking > Add network `web front end` = `BLOGHOST_EXTERNAL_IP/32`, Save
+- [x] Task 5: SSH to `bloghost`, write `index.php`, see "Database connection failed", then fill in the SQL IP and password, see "Connected successfully"
+- [x] Task 6: add the `<img src='...'>` line with the bucket's public URL above the `<h1>`, reload and see the banner
+- [x] All checks green, End Lab
 
 Startup script for `bloghost`:
 

@@ -499,6 +499,15 @@ Read theGoogle Cloud Platform documentation on Cloud SQL.
 Read theGoogle Cloud Platform documentation on Cloud Storage.
 
 
+
+---
+
+## 📝 Lab Run Notes: how Lab 3 went
+
+Done on Mon 19 Oct 2026 after four grill rounds on the M4 notes. The run was **smooth**, with no errors and no steps that differed from the video.
+
+> 💡 **Exam takeaway:** the lab's shortcuts (an `allUsers` ACL for the image, a public Cloud SQL IP with the VM's external IP as a `/32`, the password written in `index.php`) work for a demo. The production versions are IAM or a signed URL, a private IP, and Secret Manager. See Part 5 of the Lab 3 study notes.
+
 ---
 
 ## 🎓 Associate Cloud Engineer (ACE) Exam Anchors

@@ -38,6 +38,8 @@
   - [8.2 Picking a class when you read the data](#part-8-2)
   - [8.3 Grill round 1: pick the letter](#part-8-3)
   - [8.4 Grill round 2: pick the letter](#part-8-4)
+  - [8.5 Grill round 3: pick the letter](#part-8-5)
+  - [8.6 Grill round 4: whole chapter](#part-8-6)
 
 ---
 
@@ -921,5 +923,178 @@ You answered 7 to 14 on 2026-10-19 and got 5 of 8. The three slips (11, 12, 13) 
 <summary>Answer to Q14</summary>
 
 **B** (you got it). The 90-day minimum is billed in full, so 50 more days of storage.
+
+</details>
+
+<a id="part-8-5"></a>
+### 8.5 Grill round 3: pick the letter
+
+You answered 15 to 22 on 2026-10-19 and got 8 of 8. This round mixed the lab shortcuts with the which-database questions.
+
+**Q15.** One named colleague with a Google account must read a single object. Cleanest way? A. An ACL for `allUsers` B. An IAM role (Storage Object Viewer) for their account C. Make the whole bucket public D. Email them a signed URL with a 10 year expiry
+
+<details>
+<summary>Answer to Q15</summary>
+
+**B** (you got it). IAM is tied to their account, so it is private and easy to take back. A and C are public, and D is a leakable link that lasts too long.
+
+</details>
+
+**Q16.** Where should the database password live in production, instead of `index.php`? A. Leave it in `index.php` B. Secret Manager C. A public bucket D. The VM's name
+
+<details>
+<summary>Answer to Q16</summary>
+
+**B, Secret Manager** (you got it). The app reads it at run time, so it is not in code or on the VM's disk.
+
+</details>
+
+**Q17.** A global app needs a relational database with strong consistency and writes from several continents. Which one? A. Cloud SQL B. Spanner C. Bigtable D. Firestore
+
+<details>
+<summary>Answer to Q17</summary>
+
+**B, Spanner** (you got it). Relational and globally consistent, scaling horizontally across regions.
+
+</details>
+
+**Q18.** IoT sensors write millions of readings a second, looked up by key, no joins. Which one? A. Cloud SQL B. Spanner C. Bigtable D. BigQuery
+
+<details>
+<summary>Answer to Q18</summary>
+
+**C, Bigtable** (you got it). Huge key-based throughput and time-series data, but no joins.
+
+</details>
+
+**Q19.** A mobile app needs flexible JSON-like documents with real-time sync, no servers to manage. Which one? A. Firestore B. Spanner C. Cloud SQL D. BigQuery
+
+<details>
+<summary>Answer to Q19</summary>
+
+**A, Firestore** (you got it). The document database with real-time sync, similar to DynamoDB in role.
+
+</details>
+
+**Q20.** In the lab, `bloghost` shows "can't connect to database". What do you check first? A. That the VM's external IP is on `blog-db`'s authorized networks as a `/32` B. The bucket's storage class C. Versioning on the bucket D. Cloud Shell's location
+
+<details>
+<summary>Answer to Q20</summary>
+
+**A** (you got it). Cloud SQL only sees the VM's external IP, so that is what must be on the list.
+
+</details>
+
+**Q21.** SQL analytics over petabytes, built for reporting and not for app transactions. Which one? A. Cloud SQL B. BigQuery C. Firestore D. Cloud Storage
+
+<details>
+<summary>Answer to Q21</summary>
+
+**B, BigQuery** (you got it). The data warehouse.
+
+</details>
+
+**Q22.** Where does Cloud Shell run? A. On your laptop B. On a Google VM you reach from the browser, with `gcloud` already installed and signed in C. Inside `bloghost` D. Inside Git Bash
+
+<details>
+<summary>Answer to Q22</summary>
+
+**B** (you got it). It is a separate Google-run VM, not your laptop and not `bloghost`.
+
+</details>
+
+
+<a id="part-8-6"></a>
+### 8.6 Grill round 4: whole chapter
+
+You answered 23 to 32 on 2026-10-19 and got 10 of 10. It covered the whole chapter evenly.
+
+**Q23.** A bucket name must be: A. Unique inside your project B. Globally unique across all of Cloud Storage C. Unique per region D. Changeable later
+
+<details>
+<summary>Answer to Q23</summary>
+
+**B** (you got it). The lab builds the name from the project ID because project IDs are globally unique. Names cannot be changed later.
+
+</details>
+
+**Q24.** You change one line inside a 1 GB object. What does Cloud Storage do? A. Edits it in place B. You upload a whole replacement, because objects are immutable C. Appends the change D. Only updates metadata
+
+<details>
+<summary>Answer to Q24</summary>
+
+**B** (you got it). Objects are immutable, so a change means uploading a replacement.
+
+</details>
+
+**Q25.** Which location type spreads data over a large geography such as the US, for the highest availability? A. Single zone B. Dual-region C. Multi-region D. A VM disk
+
+<details>
+<summary>Answer to Q25</summary>
+
+**C** (you got it). Multi-region.
+
+</details>
+
+**Q26.** Is data at rest in Cloud Storage encrypted? A. Only if you switch it on B. Always, with Google-managed keys unless you choose your own C. Only in Archive D. Never
+
+<details>
+<summary>Answer to Q26</summary>
+
+**B** (you got it).
+
+</details>
+
+**Q27.** The two actions a lifecycle rule can take are: A. Set storage class and Delete B. Encrypt and Copy C. Rename and Move D. Share and Block
+
+<details>
+<summary>Answer to Q27</summary>
+
+**A** (you got it).
+
+</details>
+
+**Q28.** Cloud SQL runs which engines? A. MySQL, PostgreSQL and SQL Server B. Only MySQL C. MongoDB D. Cassandra
+
+<details>
+<summary>Answer to Q28</summary>
+
+**A** (you got it).
+
+</details>
+
+**Q29.** A Cloud SQL app is slow because of heavy reads. What helps most? A. Add read replicas B. Switch to Bigtable C. Delete backups D. Move to Archive
+
+<details>
+<summary>Answer to Q29</summary>
+
+**A** (you got it).
+
+</details>
+
+**Q30.** Roughly how large can a Cloud SQL instance grow? A. 1 GB B. 64 TB C. Unlimited D. 1 PB
+
+<details>
+<summary>Answer to Q30</summary>
+
+**B** (you got it).
+
+</details>
+
+**Q31.** Which IAM role lets someone only read objects? A. Storage Object Viewer B. Storage Admin C. Owner D. Storage Object Creator
+
+<details>
+<summary>Answer to Q31</summary>
+
+**A** (you got it).
+
+</details>
+
+**Q32.** In Lab 3, where is `my-excellent-blog.png` served from? A. The `bloghost` disk B. A bucket named after the project ID C. Cloud SQL D. Cloud Shell
+
+<details>
+<summary>Answer to Q32</summary>
+
+**B** (you got it).
 
 </details>

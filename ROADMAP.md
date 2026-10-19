@@ -42,7 +42,7 @@ If a day slips, do two labs the next day; Labs 1 and 2 are the shortest, so they
 | Sun 18 Oct | Lab 2 (VPC Networking and Compute Engine) completed, all checks green | Done just after midnight. Deleting `allow-icmp`, `allow-custom` and `allow-ssh` behaved as expected (see the Lab Run Notes in the lab file). Lab 2 notes (M3) with a five-round grill log and a subnet refresher written. |
 | Mon 19 Oct | Lab 3 (Cloud Storage and Cloud SQL) completed | Lab 3 notes (M4) with a four-round grill log (storage classes and read costs, ACL vs IAM, signed URLs, Cloud SQL public vs private IP, transfer maths) written and merged. |
 
-**Next:** Tue 20 Oct, M5 and M6 notes and Lab 4 (Hello Cloud Run).
+**Next:** Tue 20 Oct, M5 and M6 notes and Lab 4 (Hello Cloud Run). Notes: [study-notes/Lab4_M5-M6_Study_Notes.md](study-notes/Lab4_M5-M6_Study_Notes.md).
 
 ## Lab checklists
 

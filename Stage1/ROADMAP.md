@@ -173,19 +173,19 @@ Theory: [M5](modules/M5_Containers_in_the_Cloud/M5_Containers_in_the_Cloud_v2.md
 
 ### Master Deadlines & Critical Milestone Gates
 
-| Milestone / Gate | Date & Time (Cairo / CET) | Hard / Soft | Action Required & Rules |
-| :--- | :--- | :---: | :--- |
-| **Cohort Kick-off & Session 1** | **Mon, Nov 02, 2026**<br>2:00 PM – 3:30 PM Cairo (1:00 PM CET) | **Fixed** | Attend live review session 1 (or review recording in Google Drive). |
-| **Skills Credit Activation** | **Sat, Nov 21, 2026** (23:59 CET) | **HARD** | Redeem 400 credits using promo code `1p-gcsgsc-67` via Pub/Sub lab. **Strict deadline (no extensions).** |
-| **Voucher Request Form Opens** | **Mon, Nov 23, 2026** (Week 4) | **Fixed** | Form unlocks once Week 4 begins. |
-| **Target 5-Badge Completion** | **Thu, Dec 10, 2026** | **Target** | Complete 5 of 7 skill badges (including mandatory Gemini Enterprise). |
-| **Target Voucher Submission** | **Dec 10 – Dec 15, 2026** | **Target** | Submit public Skills Boost profile via form early. Beat the *first-come-first-served* voucher pool limit and account for 24–72h processing delay. |
-| **Pearson VUE Booking** | **Dec 15 – Dec 20, 2026** | **Target** | Apply voucher code and reserve an **In-Person** exam seat in Cairo for Jan 16–19 before university finals start. |
-| **University Finals Blackout** | **Dec 26, 2026 – Jan 11, 2027** | **Locked** | **Zero GCP stress.** 100% focus on 4 university final exams. |
-| **Voucher Form Hard Close** | **Tue, Dec 29, 2026** (23:59 CET) | **HARD** | Final cutoff to submit voucher request form. No late requests accepted. |
-| **Post-Finals Full-Time Cram** | **Jan 12 – Jan 15/18, 2027** | **Sprint** | Intensive mock exams, Claude grilling, and diagnostic review. |
-| **Target Exam Window** | **Jan 16 – Jan 19, 2027** | **Target** | Sit for official ACE in-person exam at authorized Cairo test center. |
-| **Final Exam Hard Deadline** | **Wed, Jan 20, 2027** (23:59 CET) | **HARD** | Google's absolute program cutoff to attempt the exam. |
+| Status | Milestone / Gate | Date & Time (Cairo / CET) | Hard / Soft | Action Required & Rules |
+| :---: | :--- | :--- | :---: | :--- |
+| [ ] | **Cohort Kick-off & Session 1** | **Mon, Nov 02, 2026**<br>2:00 PM – 3:30 PM Cairo (1:00 PM CET) | **Fixed** | Attend live review session 1 (or review recording in Google Drive). |
+| [ ] | **Skills Credit Activation** | **Sat, Nov 21, 2026** (23:59 CET) | **HARD** | Redeem 400 credits using promo code `1p-gcsgsc-67` via Pub/Sub lab. **Strict deadline (no extensions).** |
+| [ ] | **Voucher Request Form Opens** | **Mon, Nov 23, 2026** (Week 4) | **Fixed** | Form unlocks once Week 4 begins. |
+| [ ] | **Target 5-Badge Completion** | **Thu, Dec 10, 2026** | **Target** | Complete 5 of 7 skill badges (including mandatory Gemini Enterprise). |
+| [ ] | **Target Voucher Submission** | **Dec 10 – Dec 15, 2026** | **Target** | Submit public Skills Boost profile via form early. Beat the *first-come-first-served* voucher pool limit and account for 24–72h processing delay. |
+| [ ] | **Pearson VUE Booking** | **Dec 15 – Dec 20, 2026** | **Target** | Apply voucher code and reserve an **In-Person** exam seat in Cairo for Jan 16–19 before university finals start. |
+| [ ] | **University Finals Blackout** | **Dec 26, 2026 – Jan 11, 2027** | **Locked** | **Zero GCP stress.** 100% focus on 4 university final exams. |
+| [ ] | **Voucher Form Hard Close** | **Tue, Dec 29, 2026** (23:59 CET) | **HARD** | Final cutoff to submit voucher request form. No late requests accepted. |
+| [ ] | **Post-Finals Full-Time Cram** | **Jan 12 – Jan 15/18, 2027** | **Sprint** | Intensive mock exams, Claude grilling, and diagnostic review. |
+| [ ] | **Target Exam Window** | **Jan 16 – Jan 19, 2027** | **Target** | Sit for official ACE in-person exam at authorized Cairo test center. |
+| [ ] | **Final Exam Hard Deadline** | **Wed, Jan 20, 2027** (23:59 CET) | **HARD** | Google's absolute program cutoff to attempt the exam. |
 
 ---
 

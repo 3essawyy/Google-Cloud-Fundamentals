@@ -36,14 +36,14 @@ flowchart LR
 
 ## 📋 Progression Checklist
 
-- [ ] **Rank 1:** `01_Cloud_Marketplace.md`
+- [x] **Rank 1:** `01_Cloud_Marketplace.md` **(Score: 100%)**
   - *Focus:* Deploy pre-packaged LAMP stack, verify Apache web server, review Compute Engine VM instance.
-- [ ] **Rank 2:** `02_VPC_and_Compute_Engine.md`
+- [x] **Rank 2:** `02_VPC_and_Compute_Engine.md` **(Score: 100%)**
   - *Focus:* Build custom VPC network, define firewall rules with target tags, deploy multi-zone VMs, test internal DNS & ICMP reachability.
-- [ ] **Rank 3:** `03_Storage_and_Cloud_SQL.md`
+- [x] **Rank 3:** `03_Storage_and_Cloud_SQL.md` **(Score: 100%)**
   - *Focus:* Provision GCS bucket via `gcloud storage`, deploy Cloud SQL instance, configure Compute Engine web server to connect to SQL database and serve static assets from GCS.
-- [ ] **Rank 4:** `04_Hello_Cloud_Run.md`
-  - *Focus:* Write Dockerfile & Node.js app, package container image, upload to Artifact Registry, deploy serverless service to Cloud Run with public access.
+- [x] **Rank 4:** `04_Hello_Cloud_Run.md` **(Completed Theoretically)**
+  - *Focus:* Write Dockerfile & Node.js app, package container image, upload to Artifact Registry, deploy serverless service to Cloud Run with public access. Complete architectural and CLI analysis preserved in [`study-notes/Lab4_M5-M6_Study_Notes.md`](../study-notes/Lab4_M5-M6_Study_Notes.md).
 
 ---
 

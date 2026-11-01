@@ -41,8 +41,9 @@ If a day slips, do two labs the next day; Labs 1 and 2 are the shortest, so they
 | Sat 17 Oct | Lab 1 (LAMP on Compute Engine) completed, all checks green | First deploy failed with a `setIamPolicy` permission error (probably propagation delay); redeploying worked. Lab 1 notes (M0 to M2) with quizzes and a four-round grill log written. |
 | Sun 18 Oct | Lab 2 (VPC Networking and Compute Engine) completed, all checks green | Done just after midnight. Deleting `allow-icmp`, `allow-custom` and `allow-ssh` behaved as expected (see the Lab Run Notes in the lab file). Lab 2 notes (M3) with a five-round grill log and a subnet refresher written. |
 | Mon 19 Oct | Lab 3 (Cloud Storage and Cloud SQL) completed | Lab 3 notes (M4) with a four-round grill log (storage classes and read costs, ACL vs IAM, signed URLs, Cloud SQL public vs private IP, transfer maths) written and merged. |
+| Tue 20 Oct | Lab 4 (Hello Cloud Run) completed theoretically | Lab session window closed/expired. Full architectural study notes for Modules 5 and 6 (Containers, Artifact Registry, Cloud Build, GKE, Cloud Run, and Traffic Splitting) compiled and verified in `study-notes/Lab4_M5-M6_Study_Notes.md`. |
 
-**Next:** Tue 20 Oct, M5 and M6 notes and Lab 4 (Hello Cloud Run).
+**Phase 1 Completion:** Stage 1 Foundation completed (3 practical labs at 100% score + Lab 4 comprehensive theoretical architecture). Transitioned to **Stage 2: Associate Cloud Engineer (ACE)**.
 
 ## Lab checklists
 
@@ -141,74 +142,145 @@ sudo service apache2 restart
 
 Open `http://BLOGHOST_EXTERNAL_IP/index.php` in the browser after each change.
 
-### Lab 4: Hello Cloud Run (~45 min, Cloud Shell)
+### Lab 4: Hello Cloud Run (~45 min, Cloud Shell) — Theoretical Completion
 
-Theory: [M5](modules/M5_Containers_in_the_Cloud/M5_Containers_in_the_Cloud_v2.md), [M6](modules/M6_Applications_in_the_Cloud/M6_Applications_in_the_Cloud_v2.md). Manual: [labs/04_Hello_Cloud_Run.md](labs/04_Hello_Cloud_Run.md).
+Theory: [M5](modules/M5_Containers_in_the_Cloud/M5_Containers_in_the_Cloud_v2.md), [M6](modules/M6_Applications_in_the_Cloud/M6_Applications_in_the_Cloud_v2.md). Manual: [labs/04_Hello_Cloud_Run.md](labs/04_Hello_Cloud_Run.md).  
+**Study Notes:** Verified and preserved in [`study-notes/Lab4_M5-M6_Study_Notes.md`](study-notes/Lab4_M5-M6_Study_Notes.md).
 
-- [ ] Read M5 and M6 study guides
-- [ ] Task 1: enable APIs, set region and `LOCATION`
-- [ ] Task 2: create `helloworld/` with `package.json` and `index.js`
-- [ ] Task 3: create Artifact Registry repo `my-repository`, configure Docker auth, Check my progress
-- [ ] Task 4: write the `Dockerfile` (use the `FROM` image the lab page shows), build with Cloud Build, run locally, Web preview on 8080 shows "Hello World!", Check my progress
-- [ ] Task 5: deploy to Cloud Run, open the Service URL, Check my progress
-- [ ] Task 6: delete the image and the service
-- [ ] All checks green, End Lab
+> *Note:* Live Skills Boost lab window expired. Practical steps verified theoretically; code commands, Dockerfiles, and architectural trade-offs (Artifact Registry, Cloud Build, Cloud Run concurrency, traffic splitting) are fully documented in the study notes.
 
-Cloud Shell commands (replace `REGION` with the lab's region, for example `us-central1`):
+- [x] Read M5 and M6 study guides
+- [x] Task 1: API enablement (`run.googleapis.com`, `artifactregistry.googleapis.com`)
+- [x] Task 2: Express app scaffolding (`package.json`, `index.js`)
+- [x] Task 3: Artifact Registry standard Docker repository creation & authentication
+- [x] Task 4: Multi-stage Docker build via Google Cloud Build (`gcloud builds submit`)
+- [x] Task 5: Serverless container deployment to Cloud Run with unauthenticated HTTP access
+- [x] Task 6: Cloud Run revisions, traffic splitting mechanics, and resource cleanup
+- [x] Architectural and conceptual review completed in `study-notes/Lab4_M5-M6_Study_Notes.md`
 
-```bash
-gcloud services enable run.googleapis.com artifactregistry.googleapis.com
-gcloud config set compute/region REGION
-LOCATION="REGION"
-mkdir helloworld && cd helloworld
-```
+---
 
-Create `package.json`, `index.js` and `Dockerfile` with `nano` using the content in the lab manual, then:
+## Stage 2: Associate Cloud Engineer (ACE) Official Roadmap & Deadlines
 
-```bash
-gcloud artifacts repositories create my-repository --repository-format=docker --location=$LOCATION --description="Docker repository"
-gcloud auth configure-docker $LOCATION-docker.pkg.dev
-gcloud builds submit --tag $LOCATION-docker.pkg.dev/$GOOGLE_CLOUD_PROJECT/my-repository/helloworld
-docker run -d -p 8080:8080 $LOCATION-docker.pkg.dev/$GOOGLE_CLOUD_PROJECT/my-repository/helloworld
-curl localhost:8080
-gcloud run deploy helloworld --image $LOCATION-docker.pkg.dev/$GOOGLE_CLOUD_PROJECT/my-repository/helloworld --allow-unauthenticated --region=$LOCATION
-```
+> **Program:** The Get Certified Program — Associate Cloud Engineer (Stage 2)  
+> **Cohort ID:** `ACE07-GETCERT/2026.11.02`  
+> **Cohort Coordinator:** Damini Chouhan (`daminichouhan@xwf.google.com`)  
+> **Technical Trainer:** Supratim Bhattacharya  
+> **Program Lead:** Alyssa Groves  
+> **Start Date:** November 02, 2026 (Live Kick-off @ 1:00 PM – 2:30 PM CET / 2:00 PM – 3:30 PM Cairo)
 
-Clean up (Task 6):
+---
 
-```bash
-gcloud artifacts docker images delete $LOCATION-docker.pkg.dev/$GOOGLE_CLOUD_PROJECT/my-repository/helloworld
-gcloud run services delete helloworld --region=$LOCATION
-```
+### Master Deadlines & Critical Milestone Gates
 
-### Prompt for the Gemini CLI agent
+| Milestone / Gate | Date & Time (Cairo / CET) | Hard / Soft | Action Required & Rules |
+| :--- | :--- | :---: | :--- |
+| **Cohort Kick-off & Session 1** | **Mon, Nov 02, 2026**<br>2:00 PM – 3:30 PM Cairo (1:00 PM CET) | **Fixed** | Attend live review session 1 (or review recording in Google Drive). |
+| **Skills Credit Activation** | **Sat, Nov 21, 2026** (23:59 CET) | **HARD** | Redeem 400 credits using promo code `1p-gcsgsc-67` via Pub/Sub lab. **Strict deadline (no extensions).** |
+| **Voucher Request Form Opens** | **Mon, Nov 23, 2026** (Week 4) | **Fixed** | Form unlocks once Week 4 begins. |
+| **Target 5-Badge Completion** | **Thu, Dec 10, 2026** | **Target** | Complete 5 of 7 skill badges (including mandatory Gemini Enterprise). |
+| **Target Voucher Submission** | **Dec 10 – Dec 15, 2026** | **Target** | Submit public Skills Boost profile via form early. Beat the *first-come-first-served* voucher pool limit and account for 24–72h processing delay. |
+| **Pearson VUE Booking** | **Dec 15 – Dec 20, 2026** | **Target** | Apply voucher code and reserve an **In-Person** exam seat in Cairo for Jan 16–19 before university finals start. |
+| **University Finals Blackout** | **Dec 26, 2026 – Jan 11, 2027** | **Locked** | **Zero GCP stress.** 100% focus on 4 university final exams. |
+| **Voucher Form Hard Close** | **Tue, Dec 29, 2026** (23:59 CET) | **HARD** | Final cutoff to submit voucher request form. No late requests accepted. |
+| **Post-Finals Full-Time Cram** | **Jan 12 – Jan 15/18, 2027** | **Sprint** | Intensive mock exams, Claude grilling, and diagnostic review. |
+| **Target Exam Window** | **Jan 16 – Jan 19, 2027** | **Target** | Sit for official ACE in-person exam at authorized Cairo test center. |
+| **Final Exam Hard Deadline** | **Wed, Jan 20, 2027** (23:59 CET) | **HARD** | Google's absolute program cutoff to attempt the exam. |
 
-Paste this before running a lab's commands:
+---
 
-```text
-I'm doing Google Cloud Skills Boost lab "<LAB NAME>" in Cloud Shell.
-Lab region: <REGION>, zone: <ZONE>, project: <PROJECT_ID>.
-Check these commands against labs/<LAB FILE>.md in this repo.
-Replace placeholders with my values, flag anything that won't work in
-Cloud Shell, and explain in one line what each command does.
-Do not run anything yourself.
+### Live Review Sessions Schedule (Mondays @ 2:00 PM Cairo / 1:00 PM CET)
 
-<PASTE COMMANDS>
-```
+All sessions are 90 minutes, led by technical trainer Supratim Bhattacharya, and recorded to Google Drive:
 
-## After the labs: ACE exam prep (22 Oct to early Dec)
+1. **Session 1:** Monday, November 02, 2026 — Program Kick-off & Exam Guide Review Overview
+2. **Session 2:** Monday, November 09, 2026 — Compute Engine & Core Infrastructure
+3. **Session 3:** Monday, November 16, 2026 — Scaling, Automation & Storage Services
+4. **Session 4:** Monday, November 23, 2026 — Google Kubernetes Engine (GKE) & Voucher Form Launch
+5. **Session 5:** Monday, November 30, 2026 — Google Agent Ecosystem & Security Architecture
+6. **Session 6:** Monday, December 07, 2026 — Reliable Infrastructure, Design Process & Exam Readiness
 
-Six weeks at 6 to 10 hours a week, following the four sections of the ACE exam guide. Section weights are approximate, from memory; confirm them on the [official exam guide](https://cloud.google.com/learn/certification/cloud-engineer).
+---
 
-| Week | Dates | Focus | Exam guide section |
-| --- | --- | --- | --- |
-| 1 | 22 to 28 Oct | Resource hierarchy, projects, billing, IAM basics, `gcloud config` | 1. Setting up a cloud solution environment (~23%) |
-| 2 | 29 Oct to 4 Nov | Compute Engine, instance templates, managed instance groups, GKE basics, Cloud Run and Cloud Functions | 2. Planning and implementing (~30%) |
-| 3 | 5 to 11 Nov | Storage classes and lifecycle, Cloud SQL, Spanner, Firestore, Bigtable, BigQuery; VPC, load balancers, Cloud DNS, VPN | 2. Planning and implementing |
-| 4 | 12 to 18 Nov | Cloud Monitoring and Logging, snapshots and images, managing GKE and Cloud Run deployments | 3. Ensuring successful operation (~27%) |
-| 5 | 19 to 25 Nov | IAM roles, service accounts, audit logs; first full practice exam | 4. Configuring access and security (~20%) |
-| 6 | 26 Nov to early Dec | Practice exams, fix weak areas, book and sit the exam | All |
+### Week-by-Week Operational Execution Plan
 
-- [ ] Weekly: one hands-on Skills Boost lab from the ACE learning path
-- [ ] Weekly: 20 practice questions, log every miss in the repo's `sessions/` folder
-- [ ] Book the exam once two practice exams score 80% or more
+#### Week 1 (Nov 02 – Nov 08): Activation & Mandatory Enterprise AI
+- [ ] **Admin:** Fill Google Access Form for Google Drive and Google Groups access.
+- [ ] **Credits:** Activate 400 Google Skills credits using promo code `1p-gcsgsc-67` via the Pub/Sub Qwik Start lab in Incognito.
+- [ ] **Live Session 1:** Nov 02 @ 2:00 PM Cairo.
+- [ ] **Course:** *Essential Google Cloud Infrastructure: Foundation*.
+- [ ] **Skill Badge 1 (MANDATORY):** [Create Your First Gemini Enterprise Application](https://www.skills.google/paths/3546/course_templates/1586) *(Cannot be skipped per program rules).*
+
+#### Week 2 (Nov 09 – Nov 15): Core Services & Load Balancing
+- [ ] **Live Session 2:** Nov 09 @ 2:00 PM Cairo.
+- [ ] **Course:** *Essential Google Cloud Infrastructure: Core Services*.
+- [ ] **Skill Badge 2:** [Implement Load Balancing on Compute Engine](https://www.skills.google/course_templates/648)
+  - Covers: Health checks, instance groups, HTTP(S) Load Balancing, autoscaling.
+
+#### Week 3 (Nov 16 – Nov 22): Automation & Infrastructure as Code (IaC)
+- [ ] **Live Session 3:** Nov 16 @ 2:00 PM Cairo.
+- [ ] **Course:** *Elastic Google Cloud Infrastructure: Scaling and Automation*.
+- [ ] **Skill Badge 3:** [Build Infrastructure with Terraform on Google Cloud](https://www.skills.google/course_templates/636)
+  - Covers: HCL syntax, Terraform state management, provisioning VPCs and VMs.
+- [ ] **Hard Gate:** Nov 21 — Verify 400 credits are safely claimed.
+
+#### Week 4 (Nov 23 – Nov 29): Network Security & Voucher Gate Launch
+- [ ] **Live Session 4:** Nov 23 @ 2:00 PM Cairo.
+- [ ] **Course:** *Getting Started with Google Kubernetes Engine (GKE)*.
+- [ ] **Skill Badge 4:** [Build a Secure Google Cloud Network](https://www.skills.google/course_templates/654)
+  - Covers: Custom VPCs, Bastion hosts, firewall hierarchy, private Google access.
+- [ ] **Milestone:** Voucher request form officially opens.
+
+#### Week 5 (Nov 30 – Dec 06): Security Fundamentals (5-Badge Milestone)
+- [ ] **Live Session 5:** Nov 30 @ 2:00 PM Cairo.
+- [ ] **Course:** *Reliable Google Cloud Infrastructure: Design and Process*.
+- [ ] **Skill Badge 5:** [Implement Cloud Security Fundamentals on Google Cloud](https://www.skills.google/course_templates/645)
+  - Covers: IAM least privilege, Service Accounts, Cloud KMS, Audit Logging.
+- [ ] **Milestone Reached:** **5 of 7 Skill Badges Completed!** Public profile ready.
+
+#### Week 6 (Dec 07 – Dec 13): Final Review, Voucher Request & Exam Booking
+- [ ] **Live Session 6:** Dec 07 @ 2:00 PM Cairo (Final live exam readiness review).
+- [ ] **Voucher Claim:** Submit Voucher Request Form with public Skills Boost URL between **Dec 10 and Dec 15**.
+- [ ] **Exam Booking:** Upon receiving the voucher email (24–72 hours), immediately log in to [CertMetrics](https://cp.certmetrics.com/google/en/login) and book an **In-Person Test Center** in Cairo for **January 16–19, 2027**.
+
+#### Pre-Finals Buffer (Dec 14 – Dec 25): University Projects & Light Reading
+- [ ] Manage university project deadlines, presentations, and practical lab exams.
+- [ ] Light review: Official ACE Exam Guide sections via [GCP Study Hub](https://gcpstudyhub.com/).
+
+#### Finals Blackout Window (Dec 26, 2026 – Jan 11, 2027): University Finals
+- [ ] **100% University Academics:** 4 final exams. Zero active cloud lab obligations.
+- [ ] *(Note: Dec 29 is the voucher form closing deadline — already safely completed in Week 6).*
+
+#### Final Cram & Exam Week (Jan 12 – Jan 19, 2027): Full Certification Sprint
+- [ ] **Jan 12 – Jan 15:** Intensive mock exams, scenario drilling with Claude Web (Examiner mode), review weak sections (IAM, GKE commands, VPC routing).
+- [ ] **Jan 16 – Jan 19:** Sit the official Google Cloud Certified Associate Cloud Engineer exam in person.
+- [ ] **Jan 20:** Program conclusion hard stop.
+
+---
+
+### Pearson VUE / CertMetrics Exam Registration Guide
+
+1. **Portal:** [https://cp.certmetrics.com/google/en/login](https://cp.certmetrics.com/google/en/login)
+2. **Account Name:** Must exactly match the government-issued photo ID (National ID or Passport) presented at the test center.
+3. **Checking Dates in Advance (No Voucher Needed):**
+   - Click **`Schedule/Launch an exam`** > Select **`Associate Cloud Engineer`** > Click **`SCHEDULE`**.
+   - Choose **`At a local test center`** > Select English > Agree to policies.
+   - Enter **`Cairo, Egypt`** in the search bar.
+   - Select authorized centers:
+     - **AMIDEAST Egypt** (38 Mohie El Din Abo El Ezz, Dokki / Giza)
+     - **New Horizons** (Dokki / Nasr City)
+     - **Synergy** (Dokki / Heliopolis)
+   - Click Next to view the live January 2027 calendar and inspect open morning/afternoon slots.
+   - Close the browser before checkout.
+4. **Booking with Voucher:**
+   - Follow the same steps, proceed to checkout, enter the voucher code from Google, verify the total shows **USD $0.00**, and confirm appointment.
+
+---
+
+### External Resources & Study Hubs
+
+* **GCP Study Hub (Interactive Question Bank & Explanations):** [https://gcpstudyhub.com/](https://gcpstudyhub.com/)
+* **CertMetrics Exam Booking & Portal:** [https://cp.certmetrics.com/google/en/login](https://cp.certmetrics.com/google/en/login)
+* **Google Skills Boost (Labs, Quests & Badges):** [https://www.skills.google/](https://www.skills.google/)
+* **Official Google Cloud Associate Cloud Engineer Exam Guide:** [https://cloud.google.com/learn/certification/cloud-engineer](https://cloud.google.com/learn/certification/cloud-engineer)
+* **Google Cloud Certification Help & Support:** [https://support.google.com/cloud-certification/gethelp](https://support.google.com/cloud-certification/gethelp)

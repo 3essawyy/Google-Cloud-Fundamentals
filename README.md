@@ -17,13 +17,18 @@ Google_Cloud_Fundamentals/
 │   └── ROADMAP.md                   # Stage 1 execution sprint tracker
 │
 ├── Stage2/                          # Stage 2: Associate Cloud Engineer (ACE) Cohort
+│   ├── ReferenceDocs/               # Modular Official Google Reference Guides
+│   │   ├── 00_Program_Info_and_FAQ/
+│   │   ├── 01_Associate_Cloud_Engineer_Exam_Guide/
+│   │   ├── 02_Learning_Plan_and_Program_Details/
+│   │   ├── 03_Google_Skills_Credit_Activation_Guide/
+│   │   └── 04_PearsonVUE_Exam_Registration_Guide/
 │   ├── courses/                     # 6 On-Demand course study guides & notes
 │   ├── skill-badges/                # 5 Target skill badges and challenge lab guides
 │   ├── practice-exams/              # Scenario questions, diagnostic drills & logs
 │   ├── study-notes/                 # Architecture deep-dives (merc-v3 styled)
 │   ├── scripts/                     # Prompts & automation utilities
 │   │   └── claude_ace_project_prompt.md  # Upgraded Claude Web System Prompt
-│   ├── ReferenceDocs/               # Official Google Program PDFs, Guides & Emails
 │   └── ROADMAP.md                   # Stage 2 Master Milestone Roadmap & Deadlines
 │
 └── README.md                        # Master Portfolio Hub

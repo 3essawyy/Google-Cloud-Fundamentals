@@ -61,7 +61,7 @@
 
 
 <!-- INJECT_START: slide_01_img_01 -->
-![Proprietary + Confidential (slide_01_img_01)](learning_plan/slide_01_img_01.jpeg)
+![Proprietary + Confidential (slide_01_img_01)](media/slide_01_img_01.jpeg)
 
 **Figure 1:** [Slide 1] Proprietary + Confidential — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_01_img_01 -->
@@ -71,7 +71,7 @@
 * **Cohort start date:** November 02, 2026
 
 <!-- INJECT_START: slide_01_img_02 -->
-![Proprietary + Confidential (slide_01_img_02)](learning_plan/slide_01_img_02.jpeg)
+![Proprietary + Confidential (slide_01_img_02)](media/slide_01_img_02.jpeg)
 
 **Figure 2:** [Slide 1] Proprietary + Confidential — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_01_img_02 -->
@@ -91,21 +91,21 @@
 * Associate Cloud Engineer
 
 <!-- INJECT_START: slide_02_img_06 -->
-![Dates overview Associate Cloud Engineer (slide_02_img_06)](learning_plan/slide_02_img_06.jpeg)
+![Dates overview Associate Cloud Engineer (slide_02_img_06)](media/slide_02_img_06.jpeg)
 
 **Figure 8:** [Slide 2] Dates overview Associate Cloud Engineer — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_02_img_06 -->
 
 
 <!-- INJECT_START: slide_02_img_04 -->
-![Dates overview Associate Cloud Engineer (slide_02_img_04)](learning_plan/slide_02_img_04.jpeg)
+![Dates overview Associate Cloud Engineer (slide_02_img_04)](media/slide_02_img_04.jpeg)
 
 **Figure 6:** [Slide 2] Dates overview Associate Cloud Engineer — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_02_img_04 -->
 
 
 <!-- INJECT_START: slide_02_img_05 -->
-![Dates overview Associate Cloud Engineer (slide_02_img_05)](learning_plan/slide_02_img_05.jpeg)
+![Dates overview Associate Cloud Engineer (slide_02_img_05)](media/slide_02_img_05.jpeg)
 
 **Figure 7:** [Slide 2] Dates overview Associate Cloud Engineer — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_02_img_05 -->
@@ -114,14 +114,14 @@
 * CET
 
 <!-- INJECT_START: slide_02_img_03 -->
-![Dates overview Associate Cloud Engineer (slide_02_img_03)](learning_plan/slide_02_img_03.jpeg)
+![Dates overview Associate Cloud Engineer (slide_02_img_03)](media/slide_02_img_03.jpeg)
 
 **Figure 5:** [Slide 2] Dates overview Associate Cloud Engineer — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_02_img_03 -->
 
 
 <!-- INJECT_START: slide_02_img_02 -->
-![Dates overview Associate Cloud Engineer (slide_02_img_02)](learning_plan/slide_02_img_02.jpeg)
+![Dates overview Associate Cloud Engineer (slide_02_img_02)](media/slide_02_img_02.jpeg)
 
 **Figure 4:** [Slide 2] Dates overview Associate Cloud Engineer — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_02_img_02 -->
@@ -132,7 +132,7 @@
 * page
 
 <!-- INJECT_START: slide_02_img_01 -->
-![Dates overview Associate Cloud Engineer (slide_02_img_01)](learning_plan/slide_02_img_01.jpeg)
+![Dates overview Associate Cloud Engineer (slide_02_img_01)](media/slide_02_img_01.jpeg)
 
 **Figure 3:** [Slide 2] Dates overview Associate Cloud Engineer — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_02_img_01 -->
@@ -148,21 +148,21 @@
 * Associate Cloud Engineer
 
 <!-- INJECT_START: slide_03_img_03 -->
-![Dates overview Associate Cloud Engineer (slide_03_img_03)](learning_plan/slide_03_img_03.jpeg)
+![Dates overview Associate Cloud Engineer (slide_03_img_03)](media/slide_03_img_03.jpeg)
 
 **Figure 11:** [Slide 3] Dates overview Associate Cloud Engineer — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_03_img_03 -->
 
 
 <!-- INJECT_START: slide_03_img_05 -->
-![Dates overview Associate Cloud Engineer (slide_03_img_05)](learning_plan/slide_03_img_05.jpeg)
+![Dates overview Associate Cloud Engineer (slide_03_img_05)](media/slide_03_img_05.jpeg)
 
 **Figure 13:** [Slide 3] Dates overview Associate Cloud Engineer — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_03_img_05 -->
 
 
 <!-- INJECT_START: slide_03_img_06 -->
-![Dates overview Associate Cloud Engineer (slide_03_img_06)](learning_plan/slide_03_img_06.jpeg)
+![Dates overview Associate Cloud Engineer (slide_03_img_06)](media/slide_03_img_06.jpeg)
 
 **Figure 14:** [Slide 3] Dates overview Associate Cloud Engineer — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_03_img_06 -->
@@ -171,21 +171,21 @@
 * CET
 
 <!-- INJECT_START: slide_03_img_04 -->
-![Dates overview Associate Cloud Engineer (slide_03_img_04)](learning_plan/slide_03_img_04.jpeg)
+![Dates overview Associate Cloud Engineer (slide_03_img_04)](media/slide_03_img_04.jpeg)
 
 **Figure 12:** [Slide 3] Dates overview Associate Cloud Engineer — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_03_img_04 -->
 
 
 <!-- INJECT_START: slide_03_img_02 -->
-![Dates overview Associate Cloud Engineer (slide_03_img_02)](learning_plan/slide_03_img_02.jpeg)
+![Dates overview Associate Cloud Engineer (slide_03_img_02)](media/slide_03_img_02.jpeg)
 
 **Figure 10:** [Slide 3] Dates overview Associate Cloud Engineer — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_03_img_02 -->
 
 
 <!-- INJECT_START: slide_03_img_07 -->
-![Dates overview Associate Cloud Engineer (slide_03_img_07)](learning_plan/slide_03_img_07.jpeg)
+![Dates overview Associate Cloud Engineer (slide_03_img_07)](media/slide_03_img_07.jpeg)
 
 **Figure 15:** [Slide 3] Dates overview Associate Cloud Engineer — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_03_img_07 -->
@@ -194,7 +194,7 @@
 * continuation
 
 <!-- INJECT_START: slide_03_img_01 -->
-![Dates overview Associate Cloud Engineer (slide_03_img_01)](learning_plan/slide_03_img_01.jpeg)
+![Dates overview Associate Cloud Engineer (slide_03_img_01)](media/slide_03_img_01.jpeg)
 
 **Figure 9:** [Slide 3] Dates overview Associate Cloud Engineer — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_03_img_01 -->
@@ -211,21 +211,21 @@
 * ★ Skill badge
 
 <!-- INJECT_START: slide_04_img_04 -->
-![Learning plan Associate Cloud Engineer  ★ Skill badge (slide_04_img_04)](learning_plan/slide_04_img_04.jpeg)
+![Learning plan Associate Cloud Engineer  ★ Skill badge (slide_04_img_04)](media/slide_04_img_04.jpeg)
 
 **Figure 19:** [Slide 4] Learning plan Associate Cloud Engineer  ★ Skill badge — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_04_img_04 -->
 
 
 <!-- INJECT_START: slide_04_img_02 -->
-![Learning plan Associate Cloud Engineer  ★ Skill badge (slide_04_img_02)](learning_plan/slide_04_img_02.jpeg)
+![Learning plan Associate Cloud Engineer  ★ Skill badge (slide_04_img_02)](media/slide_04_img_02.jpeg)
 
 **Figure 17:** [Slide 4] Learning plan Associate Cloud Engineer  ★ Skill badge — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_04_img_02 -->
 
 
 <!-- INJECT_START: slide_04_img_03 -->
-![Learning plan Associate Cloud Engineer  ★ Skill badge (slide_04_img_03)](learning_plan/slide_04_img_03.jpeg)
+![Learning plan Associate Cloud Engineer  ★ Skill badge (slide_04_img_03)](media/slide_04_img_03.jpeg)
 
 **Figure 18:** [Slide 4] Learning plan Associate Cloud Engineer  ★ Skill badge — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_04_img_03 -->
@@ -236,7 +236,7 @@
 * page
 
 <!-- INJECT_START: slide_04_img_01 -->
-![Learning plan Associate Cloud Engineer  ★ Skill badge (slide_04_img_01)](learning_plan/slide_04_img_01.jpeg)
+![Learning plan Associate Cloud Engineer  ★ Skill badge (slide_04_img_01)](media/slide_04_img_01.jpeg)
 
 **Figure 16:** [Slide 4] Learning plan Associate Cloud Engineer  ★ Skill badge — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_04_img_01 -->
@@ -252,7 +252,7 @@
 * Associate Cloud Engineer
 
 <!-- INJECT_START: slide_05_img_05 -->
-![Learning plan Associate Cloud Engineer (slide_05_img_05)](learning_plan/slide_05_img_05.jpeg)
+![Learning plan Associate Cloud Engineer (slide_05_img_05)](media/slide_05_img_05.jpeg)
 
 **Figure 24:** [Slide 5] Learning plan Associate Cloud Engineer — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_05_img_05 -->
@@ -260,21 +260,21 @@
 * ★ Skill badge
 
 <!-- INJECT_START: slide_05_img_03 -->
-![Learning plan Associate Cloud Engineer (slide_05_img_03)](learning_plan/slide_05_img_03.jpeg)
+![Learning plan Associate Cloud Engineer (slide_05_img_03)](media/slide_05_img_03.jpeg)
 
 **Figure 22:** [Slide 5] Learning plan Associate Cloud Engineer — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_05_img_03 -->
 
 
 <!-- INJECT_START: slide_05_img_02 -->
-![Learning plan Associate Cloud Engineer (slide_05_img_02)](learning_plan/slide_05_img_02.jpeg)
+![Learning plan Associate Cloud Engineer (slide_05_img_02)](media/slide_05_img_02.jpeg)
 
 **Figure 21:** [Slide 5] Learning plan Associate Cloud Engineer — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_05_img_02 -->
 
 
 <!-- INJECT_START: slide_05_img_04 -->
-![Learning plan Associate Cloud Engineer (slide_05_img_04)](learning_plan/slide_05_img_04.jpeg)
+![Learning plan Associate Cloud Engineer (slide_05_img_04)](media/slide_05_img_04.jpeg)
 
 **Figure 23:** [Slide 5] Learning plan Associate Cloud Engineer — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_05_img_04 -->
@@ -283,7 +283,7 @@
 * continuation
 
 <!-- INJECT_START: slide_05_img_01 -->
-![Learning plan Associate Cloud Engineer (slide_05_img_01)](learning_plan/slide_05_img_01.jpeg)
+![Learning plan Associate Cloud Engineer (slide_05_img_01)](media/slide_05_img_01.jpeg)
 
 **Figure 20:** [Slide 5] Learning plan Associate Cloud Engineer — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_05_img_01 -->
@@ -317,35 +317,35 @@
 * exam by 20th January, 2027.
 
 <!-- INJECT_START: slide_06_img_02 -->
-![Proprietary + Confidential Program elements (slide_06_img_02)](learning_plan/slide_06_img_02.jpeg)
+![Proprietary + Confidential Program elements (slide_06_img_02)](media/slide_06_img_02.jpeg)
 
 **Figure 26:** [Slide 6] Proprietary + Confidential Program elements — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_06_img_02 -->
 
 
 <!-- INJECT_START: slide_06_img_03 -->
-![Proprietary + Confidential Program elements (slide_06_img_03)](learning_plan/slide_06_img_03.jpeg)
+![Proprietary + Confidential Program elements (slide_06_img_03)](media/slide_06_img_03.jpeg)
 
 **Figure 27:** [Slide 6] Proprietary + Confidential Program elements — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_06_img_03 -->
 
 
 <!-- INJECT_START: slide_06_img_04 -->
-![Proprietary + Confidential Program elements (slide_06_img_04)](learning_plan/slide_06_img_04.jpeg)
+![Proprietary + Confidential Program elements (slide_06_img_04)](media/slide_06_img_04.jpeg)
 
 **Figure 28:** [Slide 6] Proprietary + Confidential Program elements — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_06_img_04 -->
 
 
 <!-- INJECT_START: slide_06_img_05 -->
-![Proprietary + Confidential Program elements (slide_06_img_05)](learning_plan/slide_06_img_05.jpeg)
+![Proprietary + Confidential Program elements (slide_06_img_05)](media/slide_06_img_05.jpeg)
 
 **Figure 29:** [Slide 6] Proprietary + Confidential Program elements — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_06_img_05 -->
 
 
 <!-- INJECT_START: slide_06_img_06 -->
-![Proprietary + Confidential Program elements (slide_06_img_06)](learning_plan/slide_06_img_06.jpeg)
+![Proprietary + Confidential Program elements (slide_06_img_06)](media/slide_06_img_06.jpeg)
 
 **Figure 30:** [Slide 6] Proprietary + Confidential Program elements — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_06_img_06 -->
@@ -364,7 +364,7 @@
 * labs.
 
 <!-- INJECT_START: slide_06_img_01 -->
-![Proprietary + Confidential Program elements (slide_06_img_01)](learning_plan/slide_06_img_01.jpeg)
+![Proprietary + Confidential Program elements (slide_06_img_01)](media/slide_06_img_01.jpeg)
 
 **Figure 25:** [Slide 6] Proprietary + Confidential Program elements — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_06_img_01 -->
@@ -420,7 +420,7 @@
 * To grant the access to Google Groups and Google Drive.
 
 <!-- INJECT_START: slide_07_img_01 -->
-![Proprietary + Confidential Program shortcuts (slide_07_img_01)](learning_plan/slide_07_img_01.jpeg)
+![Proprietary + Confidential Program shortcuts (slide_07_img_01)](media/slide_07_img_01.jpeg)
 
 **Figure 31:** [Slide 7] Proprietary + Confidential Program shortcuts — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_07_img_01 -->

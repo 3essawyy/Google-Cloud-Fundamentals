@@ -97,7 +97,7 @@
 
 
 <!-- INJECT_START: slide_01_img_01 -->
-![Slide 1 (slide_01_img_01)](pearson_vue/slide_01_img_01.jpeg)
+![Slide 1 (slide_01_img_01)](media/slide_01_img_01.jpeg)
 
 **Figure 1:** [Slide 1] Slide 1 — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_01_img_01 -->
@@ -106,7 +106,7 @@
 * Cloud Certification Exams?
 
 <!-- INJECT_START: slide_01_img_02 -->
-![Slide 1 (slide_01_img_02)](pearson_vue/slide_01_img_02.jpeg)
+![Slide 1 (slide_01_img_02)](media/slide_01_img_02.jpeg)
 
 **Figure 2:** [Slide 1] Slide 1 — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_01_img_02 -->
@@ -120,7 +120,7 @@
 
 
 <!-- INJECT_START: slide_02_img_01 -->
-![Slide 2 (slide_02_img_01)](pearson_vue/slide_02_img_01.jpeg)
+![Slide 2 (slide_02_img_01)](media/slide_02_img_01.jpeg)
 
 **Figure 3:** [Slide 2] Slide 2 — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_02_img_01 -->
@@ -131,7 +131,7 @@
 * a voucher
 
 <!-- INJECT_START: slide_02_img_02 -->
-![Slide 2 (slide_02_img_02)](pearson_vue/slide_02_img_02.jpeg)
+![Slide 2 (slide_02_img_02)](media/slide_02_img_02.jpeg)
 
 **Figure 4:** [Slide 2] Slide 2 — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_02_img_02 -->
@@ -144,7 +144,7 @@
 
 
 <!-- INJECT_START: slide_03_img_01 -->
-![Step 1 (slide_03_img_01)](pearson_vue/slide_03_img_01.jpeg)
+![Step 1 (slide_03_img_01)](media/slide_03_img_01.jpeg)
 
 **Figure 5:** [Slide 3] Step 1 — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_03_img_01 -->
@@ -164,7 +164,7 @@
 * registration process
 
 <!-- INJECT_START: slide_03_img_02 -->
-![Step 1 (slide_03_img_02)](pearson_vue/slide_03_img_02.jpeg)
+![Step 1 (slide_03_img_02)](media/slide_03_img_02.jpeg)
 
 **Figure 6:** [Slide 3] Step 1 — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_03_img_02 -->
@@ -180,7 +180,7 @@
 
 
 <!-- INJECT_START: slide_04_img_01 -->
-![Step 2 (slide_04_img_01)](pearson_vue/slide_04_img_01.jpeg)
+![Step 2 (slide_04_img_01)](media/slide_04_img_01.jpeg)
 
 **Figure 7:** [Slide 4] Step 2 — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_04_img_01 -->
@@ -192,7 +192,7 @@
 * the login page. Please log in.
 
 <!-- INJECT_START: slide_04_fig_02 -->
-![Step 2 (slide_04_fig_02)](pearson_vue/slide_04_fig_02.png)
+![Step 2 (slide_04_fig_02)](media/slide_04_fig_02.png)
 
 **Figure 8:** [Slide 4] Step 2 — Mathematical Derivation & Formulas
 <!-- INJECT_END: slide_04_fig_02 -->
@@ -205,7 +205,7 @@
 
 
 <!-- INJECT_START: slide_05_img_01 -->
-![Step 3 (slide_05_img_01)](pearson_vue/slide_05_img_01.jpeg)
+![Step 3 (slide_05_img_01)](media/slide_05_img_01.jpeg)
 
 **Figure 9:** [Slide 5] Step 3 — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_05_img_01 -->
@@ -223,7 +223,7 @@
 * registration process.
 
 <!-- INJECT_START: slide_05_fig_02 -->
-![Step 3 (slide_05_fig_02)](pearson_vue/slide_05_fig_02.png)
+![Step 3 (slide_05_fig_02)](media/slide_05_fig_02.png)
 
 **Figure 10:** [Slide 5] Step 3 — Mathematical Derivation & Formulas
 <!-- INJECT_END: slide_05_fig_02 -->
@@ -236,7 +236,7 @@
 
 
 <!-- INJECT_START: slide_06_img_01 -->
-![Step 4 (slide_06_img_01)](pearson_vue/slide_06_img_01.jpeg)
+![Step 4 (slide_06_img_01)](media/slide_06_img_01.jpeg)
 
 **Figure 11:** [Slide 6] Step 4 — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_06_img_01 -->
@@ -256,7 +256,7 @@
 * Scheduling page.
 
 <!-- INJECT_START: slide_06_fig_02 -->
-![Step 4 (slide_06_fig_02)](pearson_vue/slide_06_fig_02.png)
+![Step 4 (slide_06_fig_02)](media/slide_06_fig_02.png)
 
 **Figure 12:** [Slide 6] Step 4 — Mathematical Derivation & Formulas
 <!-- INJECT_END: slide_06_fig_02 -->
@@ -269,7 +269,7 @@
 
 
 <!-- INJECT_START: slide_07_img_01 -->
-![Step 5 (slide_07_img_01)](pearson_vue/slide_07_img_01.jpeg)
+![Step 5 (slide_07_img_01)](media/slide_07_img_01.jpeg)
 
 **Figure 13:** [Slide 7] Step 5 — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_07_img_01 -->
@@ -288,7 +288,7 @@
 * 'SCHEDULE' button.
 
 <!-- INJECT_START: slide_07_fig_02 -->
-![Step 5 (slide_07_fig_02)](pearson_vue/slide_07_fig_02.png)
+![Step 5 (slide_07_fig_02)](media/slide_07_fig_02.png)
 
 **Figure 14:** [Slide 7] Step 5 — Mathematical Derivation & Formulas
 <!-- INJECT_END: slide_07_fig_02 -->
@@ -301,7 +301,7 @@
 
 
 <!-- INJECT_START: slide_08_img_01 -->
-![Step 6 (slide_08_img_01)](pearson_vue/slide_08_img_01.jpeg)
+![Step 6 (slide_08_img_01)](media/slide_08_img_01.jpeg)
 
 **Figure 15:** [Slide 8] Step 6 — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_08_img_01 -->
@@ -334,7 +334,7 @@
 
 
 <!-- INJECT_START: slide_09_img_01 -->
-![Step 7 (slide_09_img_01)](pearson_vue/slide_09_img_01.jpeg)
+![Step 7 (slide_09_img_01)](media/slide_09_img_01.jpeg)
 
 **Figure 16:** [Slide 9] Step 7 — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_09_img_01 -->
@@ -346,7 +346,7 @@
 * Click 'Next' to proceed.
 
 <!-- INJECT_START: slide_09_fig_02 -->
-![Step 7 (slide_09_fig_02)](pearson_vue/slide_09_fig_02.png)
+![Step 7 (slide_09_fig_02)](media/slide_09_fig_02.png)
 
 **Figure 17:** [Slide 9] Step 7 — Mathematical Derivation & Formulas
 <!-- INJECT_END: slide_09_fig_02 -->
@@ -359,7 +359,7 @@
 
 
 <!-- INJECT_START: slide_10_img_01 -->
-![Step 8 (slide_10_img_01)](pearson_vue/slide_10_img_01.jpeg)
+![Step 8 (slide_10_img_01)](media/slide_10_img_01.jpeg)
 
 **Figure 18:** [Slide 10] Step 8 — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_10_img_01 -->
@@ -379,7 +379,7 @@
 
 
 <!-- INJECT_START: slide_11_img_01 -->
-![Step 9 (slide_11_img_01)](pearson_vue/slide_11_img_01.jpeg)
+![Step 9 (slide_11_img_01)](media/slide_11_img_01.jpeg)
 
 **Figure 19:** [Slide 11] Step 9 — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_11_img_01 -->
@@ -407,7 +407,7 @@
 
 
 <!-- INJECT_START: slide_12_img_01 -->
-![Step 10 (slide_12_img_01)](pearson_vue/slide_12_img_01.jpeg)
+![Step 10 (slide_12_img_01)](media/slide_12_img_01.jpeg)
 
 **Figure 20:** [Slide 12] Step 10 — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_12_img_01 -->
@@ -428,7 +428,7 @@
 * have confirmed your selection.
 
 <!-- INJECT_START: slide_12_img_02 -->
-![Step 10 (slide_12_img_02)](pearson_vue/slide_12_img_02.jpeg)
+![Step 10 (slide_12_img_02)](media/slide_12_img_02.jpeg)
 
 **Figure 21:** [Slide 12] Step 10 — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_12_img_02 -->
@@ -442,7 +442,7 @@
 
 
 <!-- INJECT_START: slide_13_img_01 -->
-![Step 11 (slide_13_img_01)](pearson_vue/slide_13_img_01.jpeg)
+![Step 11 (slide_13_img_01)](media/slide_13_img_01.jpeg)
 
 **Figure 22:** [Slide 13] Step 11 — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_13_img_01 -->
@@ -464,21 +464,21 @@
 
 
 <!-- INJECT_START: slide_14_img_02 -->
-![Step 12 (slide_14_img_02)](pearson_vue/slide_14_img_02.jpeg)
+![Step 12 (slide_14_img_02)](media/slide_14_img_02.jpeg)
 
 **Figure 24:** [Slide 14] Step 12 — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_14_img_02 -->
 
 
 <!-- INJECT_START: slide_14_fig_01 -->
-![Step 12 (slide_14_fig_01)](pearson_vue/slide_14_fig_01.png)
+![Step 12 (slide_14_fig_01)](media/slide_14_fig_01.png)
 
 **Figure 25:** [Slide 14] Step 12 — System Flowchart & Process Architecture
 <!-- INJECT_END: slide_14_fig_01 -->
 
 
 <!-- INJECT_START: slide_14_img_01 -->
-![Step 12 (slide_14_img_01)](pearson_vue/slide_14_img_01.jpeg)
+![Step 12 (slide_14_img_01)](media/slide_14_img_01.jpeg)
 
 **Figure 23:** [Slide 14] Step 12 — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_14_img_01 -->
@@ -491,7 +491,7 @@
 
 
 <!-- INJECT_START: slide_15_img_01 -->
-![Step 13 (slide_15_img_01)](pearson_vue/slide_15_img_01.jpeg)
+![Step 13 (slide_15_img_01)](media/slide_15_img_01.jpeg)
 
 **Figure 26:** [Slide 15] Step 13 — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_15_img_01 -->
@@ -515,7 +515,7 @@
 
 
 <!-- INJECT_START: slide_16_img_01 -->
-![Exam in a Testing Center (slide_16_img_01)](pearson_vue/slide_16_img_01.jpeg)
+![Exam in a Testing Center (slide_16_img_01)](media/slide_16_img_01.jpeg)
 
 **Figure 27:** [Slide 16] Exam in a Testing Center — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_16_img_01 -->
@@ -542,7 +542,7 @@
 
 
 <!-- INJECT_START: slide_17_img_01 -->
-![Slide 17 (slide_17_img_01)](pearson_vue/slide_17_img_01.jpeg)
+![Slide 17 (slide_17_img_01)](media/slide_17_img_01.jpeg)
 
 **Figure 28:** [Slide 17] Slide 17 — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_17_img_01 -->
@@ -551,7 +551,7 @@
 * Online Proctored exam registration
 
 <!-- INJECT_START: slide_17_img_02 -->
-![Slide 17 (slide_17_img_02)](pearson_vue/slide_17_img_02.jpeg)
+![Slide 17 (slide_17_img_02)](media/slide_17_img_02.jpeg)
 
 **Figure 29:** [Slide 17] Slide 17 — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_17_img_02 -->
@@ -564,7 +564,7 @@
 
 
 <!-- INJECT_START: slide_18_img_01 -->
-![Step 6 (slide_18_img_01)](pearson_vue/slide_18_img_01.jpeg)
+![Step 6 (slide_18_img_01)](media/slide_18_img_01.jpeg)
 
 **Figure 30:** [Slide 18] Step 6 — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_18_img_01 -->
@@ -592,7 +592,7 @@
 
 
 <!-- INJECT_START: slide_19_img_01 -->
-![Step 7 (slide_19_img_01)](pearson_vue/slide_19_img_01.jpeg)
+![Step 7 (slide_19_img_01)](media/slide_19_img_01.jpeg)
 
 **Figure 31:** [Slide 19] Step 7 — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_19_img_01 -->
@@ -604,7 +604,7 @@
 * Click 'Next' to proceed.
 
 <!-- INJECT_START: slide_19_fig_02 -->
-![Step 7 (slide_19_fig_02)](pearson_vue/slide_19_fig_02.png)
+![Step 7 (slide_19_fig_02)](media/slide_19_fig_02.png)
 
 **Figure 32:** [Slide 19] Step 7 — Mathematical Derivation & Formulas
 <!-- INJECT_END: slide_19_fig_02 -->
@@ -617,7 +617,7 @@
 
 
 <!-- INJECT_START: slide_20_img_01 -->
-![Step 8 (slide_20_img_01)](pearson_vue/slide_20_img_01.jpeg)
+![Step 8 (slide_20_img_01)](media/slide_20_img_01.jpeg)
 
 **Figure 33:** [Slide 20] Step 8 — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_20_img_01 -->
@@ -630,7 +630,7 @@
 * proceed to the next step.
 
 <!-- INJECT_START: slide_20_fig_02 -->
-![Step 8 (slide_20_fig_02)](pearson_vue/slide_20_fig_02.png)
+![Step 8 (slide_20_fig_02)](media/slide_20_fig_02.png)
 
 **Figure 34:** [Slide 20] Step 8 — Mathematical Derivation & Formulas
 <!-- INJECT_END: slide_20_fig_02 -->
@@ -643,7 +643,7 @@
 
 
 <!-- INJECT_START: slide_21_img_01 -->
-![Step 9 (slide_21_img_01)](pearson_vue/slide_21_img_01.jpeg)
+![Step 9 (slide_21_img_01)](media/slide_21_img_01.jpeg)
 
 **Figure 35:** [Slide 21] Step 9 — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_21_img_01 -->
@@ -653,7 +653,7 @@
 * prefer proctor to speak.
 
 <!-- INJECT_START: slide_21_fig_02 -->
-![Step 9 (slide_21_fig_02)](pearson_vue/slide_21_fig_02.png)
+![Step 9 (slide_21_fig_02)](media/slide_21_fig_02.png)
 
 **Figure 36:** [Slide 21] Step 9 — Mathematical Derivation & Formulas
 <!-- INJECT_END: slide_21_fig_02 -->
@@ -666,7 +666,7 @@
 
 
 <!-- INJECT_START: slide_22_img_01 -->
-![Step 10 (slide_22_img_01)](pearson_vue/slide_22_img_01.jpeg)
+![Step 10 (slide_22_img_01)](media/slide_22_img_01.jpeg)
 
 **Figure 37:** [Slide 22] Step 10 — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_22_img_01 -->
@@ -687,7 +687,7 @@
 
 
 <!-- INJECT_START: slide_23_img_01 -->
-![Step 11 (slide_23_img_01)](pearson_vue/slide_23_img_01.jpeg)
+![Step 11 (slide_23_img_01)](media/slide_23_img_01.jpeg)
 
 **Figure 38:** [Slide 23] Step 11 — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_23_img_01 -->
@@ -714,7 +714,7 @@
 
 
 <!-- INJECT_START: slide_24_img_01 -->
-![Step 12 (slide_24_img_01)](pearson_vue/slide_24_img_01.jpeg)
+![Step 12 (slide_24_img_01)](media/slide_24_img_01.jpeg)
 
 **Figure 39:** [Slide 24] Step 12 — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_24_img_01 -->
@@ -736,21 +736,21 @@
 
 
 <!-- INJECT_START: slide_25_img_02 -->
-![Step 13 (slide_25_img_02)](pearson_vue/slide_25_img_02.jpeg)
+![Step 13 (slide_25_img_02)](media/slide_25_img_02.jpeg)
 
 **Figure 41:** [Slide 25] Step 13 — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_25_img_02 -->
 
 
 <!-- INJECT_START: slide_25_fig_01 -->
-![Step 13 (slide_25_fig_01)](pearson_vue/slide_25_fig_01.png)
+![Step 13 (slide_25_fig_01)](media/slide_25_fig_01.png)
 
 **Figure 42:** [Slide 25] Step 13 — System Flowchart & Process Architecture
 <!-- INJECT_END: slide_25_fig_01 -->
 
 
 <!-- INJECT_START: slide_25_img_01 -->
-![Step 13 (slide_25_img_01)](pearson_vue/slide_25_img_01.jpeg)
+![Step 13 (slide_25_img_01)](media/slide_25_img_01.jpeg)
 
 **Figure 40:** [Slide 25] Step 13 — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_25_img_01 -->
@@ -763,7 +763,7 @@
 
 
 <!-- INJECT_START: slide_26_img_01 -->
-![Step 14 (slide_26_img_01)](pearson_vue/slide_26_img_01.jpeg)
+![Step 14 (slide_26_img_01)](media/slide_26_img_01.jpeg)
 
 **Figure 43:** [Slide 26] Step 14 — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_26_img_01 -->
@@ -787,14 +787,14 @@
 
 
 <!-- INJECT_START: slide_27_img_01 -->
-![Online Proctored Exam (slide_27_img_01)](pearson_vue/slide_27_img_01.jpeg)
+![Online Proctored Exam (slide_27_img_01)](media/slide_27_img_01.jpeg)
 
 **Figure 44:** [Slide 27] Online Proctored Exam — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_27_img_01 -->
 
 
 <!-- INJECT_START: slide_27_fig_02 -->
-![Online Proctored Exam (slide_27_fig_02)](pearson_vue/slide_27_fig_02.png)
+![Online Proctored Exam (slide_27_fig_02)](media/slide_27_fig_02.png)
 
 **Figure 45:** [Slide 27] Online Proctored Exam — System Flowchart & Process Architecture
 <!-- INJECT_END: slide_27_fig_02 -->
@@ -807,7 +807,7 @@
 
 
 <!-- INJECT_START: slide_28_img_01 -->
-![Important information (slide_28_img_01)](pearson_vue/slide_28_img_01.jpeg)
+![Important information (slide_28_img_01)](media/slide_28_img_01.jpeg)
 
 **Figure 46:** [Slide 28] Important information — Visual Illustration & Context Reference
 <!-- INJECT_END: slide_28_img_01 -->

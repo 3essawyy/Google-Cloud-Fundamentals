@@ -1,7 +1,3 @@
-# Raw course binaries & HTML downloads
-raw_materials/
-**/raw_materials/
-
 # Extracted slide screenshots & images
 modules/*/media/
 **/media/
